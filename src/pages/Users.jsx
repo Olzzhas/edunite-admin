@@ -5,7 +5,7 @@ import { FiUser, FiSearch, FiFilter } from 'react-icons/fi';
 
 const Users = () => {
   const dispatch = useDispatch();
-  const { users, totalElements, totalPages, currentPage, pageSize, loading, error } = useSelector(
+  const { users, totalElements, totalPages, pageSize, loading, error } = useSelector(
     (state) => state.users
   );
 
@@ -15,12 +15,24 @@ const Users = () => {
     name: '',
   });
 
+  // Track current page in component state
+  const [currentPageState, setCurrentPageState] = useState(1);
+
+  // Debug pagination values
+  useEffect(() => {
+    console.log('Pagination values:', { totalElements, totalPages, pageSize });
+  }, [totalElements, totalPages, pageSize]);
+
   useEffect(() => {
     console.log('useEffect triggered with filters:', filters);
+    // Reset to page 1 when filters change
+    setCurrentPageState(1);
     dispatch(fetchUsers({ page: 1, size: 10, filters }));
   }, [dispatch, filters]);
 
   const handlePageChange = (page) => {
+    console.log(`Changing to page ${page}`);
+    setCurrentPageState(page);
     dispatch(fetchUsers({ page, size: pageSize, filters }));
   };
 
@@ -271,10 +283,10 @@ const Users = () => {
           <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage <= 1}
+                onClick={() => handlePageChange(Math.max(1, currentPageState - 1))}
+                disabled={currentPageState <= 1}
                 className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage <= 1
+                  currentPageState <= 1
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
@@ -282,10 +294,10 @@ const Users = () => {
                 Previous
               </button>
               <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage >= totalPages}
+                onClick={() => handlePageChange(currentPageState + 1)}
+                disabled={currentPageState >= totalPages}
                 className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage >= totalPages
+                  currentPageState >= totalPages
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
@@ -300,23 +312,25 @@ const Users = () => {
                     <span>No results found</span>
                   ) : (
                     <>
-                      Showing <span className="font-medium">{totalElements > 0 ? ((currentPage - 1) * pageSize) + 1 : 0}</span> to{' '}
+                      Showing <span className="font-medium">{totalElements > 0 ? ((currentPageState - 1) * pageSize) + 1 : 0}</span> to{' '}
                       <span className="font-medium">
-                        {Math.min(currentPage * pageSize, totalElements)}
+                        {Math.min(currentPageState * pageSize, totalElements)}
                       </span>{' '}
                       of <span className="font-medium">{totalElements}</span> results
                     </>
                   )}
                 </p>
               </div>
-              {totalPages > 1 && (
+              {console.log('Should show pagination UI?', totalPages > 1, 'totalPages =', totalPages)}
+              {/* Force show pagination for testing */}
+              {(totalPages >= 1) && (
                 <div>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                     <button
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                      disabled={currentPage <= 1}
+                      onClick={() => handlePageChange(Math.max(1, currentPageState - 1))}
+                      disabled={currentPageState <= 1}
                       className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                        currentPage <= 1
+                        currentPageState <= 1
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-500 hover:bg-gray-50'
                       }`}
@@ -337,12 +351,12 @@ const Users = () => {
                       </svg>
                     </button>
 
-                    {totalPages > 0 && [...Array(totalPages).keys()].map((page) => (
+                    {(totalPages > 0 ? [...Array(totalPages).keys()] : [0, 1]).map((page) => (
                       <button
                         key={page}
                         onClick={() => handlePageChange(page + 1)}
                         className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          currentPage === page + 1
+                          currentPageState === page + 1
                             ? 'z-10 bg-primary-50 border-primary-500 text-primary-600'
                             : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                         }`}
@@ -352,10 +366,10 @@ const Users = () => {
                     ))}
 
                     <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage >= totalPages}
+                      onClick={() => handlePageChange(currentPageState + 1)}
+                      disabled={currentPageState >= totalPages}
                       className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                        currentPage >= totalPages
+                        currentPageState >= totalPages
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-500 hover:bg-gray-50'
                       }`}

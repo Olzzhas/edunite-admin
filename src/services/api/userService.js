@@ -84,6 +84,8 @@ const userService = {
           sort: '-created_at'  // Default sort by created_at descending
         };
 
+        console.log(`Requesting page ${page} with page_size ${size}`);
+
         // Combine email and name filters into a single search parameter if either exists
         if ((filters.email && filters.email !== '') || (filters.name && filters.name !== '')) {
           params.search = filters.email || filters.name;
@@ -92,6 +94,9 @@ const userService = {
         console.log('API request params:', params);
 
         const response = await apiClient.get('/user/users', { params });
+
+        // Log the raw API response for debugging
+        console.log('Raw API response:', response.data);
 
         // Handle case where API returns null, undefined, or non-standard response
         if (!response.data || typeof response.data !== 'object') {

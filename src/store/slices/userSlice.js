@@ -24,13 +24,46 @@ export const fetchUsers = createAsyncThunk(
         }
 
         // Transform the API response to match our expected format with client-side filtered users
-        return {
-          content: filteredUsers,
-          totalElements: filteredUsers.length, // Update count based on filtered results
-          totalPages: Math.ceil(filteredUsers.length / size),
-          size: response.page_size,
-          number: response.current_page,
-        };
+        console.log('Original API pagination data:', {
+          current_page: response.current_page,
+          page_size: response.page_size,
+          first_page: response.first_page,
+          last_page: response.last_page,
+          total_records: response.total_records
+        });
+
+        // If we're doing client-side filtering, we need to adjust the pagination
+        if (filters.role && filters.role !== '') {
+          return {
+            content: filteredUsers,
+            totalElements: filteredUsers.length, // Update count based on filtered results
+            totalPages: Math.ceil(filteredUsers.length / size),
+            size: response.page_size,
+            number: response.current_page,
+          };
+        } else {
+          // If no client-side filtering, use the server's pagination data
+          // Make sure we have valid pagination data
+          const totalRecords = response.total_records || 0;
+          const lastPage = response.last_page || 1;
+          const pageSize = response.page_size || 10;
+          const currentPage = response.current_page || 1;
+
+          console.log('Using server pagination data:', {
+            totalRecords,
+            lastPage,
+            pageSize,
+            currentPage
+          });
+
+          return {
+            content: filteredUsers,
+            totalElements: totalRecords,
+            totalPages: lastPage,
+            size: pageSize,
+            number: currentPage,
+          };
+        }
       }
 
       // Ensure we have a valid response with required fields
@@ -174,6 +207,13 @@ const userSlice = createSlice({
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.number;
         state.pageSize = action.payload.size;
+
+        console.log('Redux state updated with pagination:', {
+          totalElements: state.totalElements,
+          totalPages: state.totalPages,
+          currentPage: state.currentPage,
+          pageSize: state.pageSize
+        });
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
