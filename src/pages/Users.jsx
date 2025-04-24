@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '../store/slices/userSlice';
 import { FiUser, FiSearch, FiFilter } from 'react-icons/fi';
@@ -8,31 +8,51 @@ const Users = () => {
   const { users, totalElements, totalPages, currentPage, pageSize, loading, error } = useSelector(
     (state) => state.users
   );
-  
+
   const [filters, setFilters] = useState({
     role: '',
     email: '',
     name: '',
   });
-  
+
   useEffect(() => {
-    dispatch(fetchUsers({ page: 0, size: 10, filters }));
+    console.log('useEffect triggered with filters:', filters);
+    dispatch(fetchUsers({ page: 1, size: 10, filters }));
   }, [dispatch, filters]);
-  
+
   const handlePageChange = (page) => {
     dispatch(fetchUsers({ page, size: pageSize, filters }));
   };
-  
-  const handleFilterChange = (e) => {
+
+  // Use useCallback to prevent unnecessary re-renders
+  const handleFilterChange = useCallback((e) => {
     const { name, value } = e.target;
+    console.log(`Filter changed: ${name} = ${value}`);
+
+    // For role filter, we'll show a message that it's filtered client-side
+    if (name === 'role' && value) {
+      console.log('Role filtering will be applied client-side');
+    }
+
     setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-  
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
-    dispatch(fetchUsers({ page: 0, size: pageSize, filters }));
+    console.log('Search button clicked, applying filters:', filters);
+
+    // Show which filters will be applied server-side vs client-side
+    if (filters.name || filters.email) {
+      console.log('Name/Email search will be sent to server as "search" parameter');
+    }
+
+    if (filters.role) {
+      console.log('Role filter will be applied client-side after data is fetched');
+    }
+
+    dispatch(fetchUsers({ page: 1, size: pageSize, filters }));
   };
-  
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -41,7 +61,7 @@ const Users = () => {
           Add User
         </button>
       </div>
-      
+
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
         <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
@@ -64,7 +84,7 @@ const Users = () => {
               />
             </div>
           </div>
-          
+
           <div className="flex-1 min-w-[200px]">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -84,7 +104,7 @@ const Users = () => {
               />
             </div>
           </div>
-          
+
           <div className="flex-1 min-w-[200px]">
             <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
               Role
@@ -107,7 +127,7 @@ const Users = () => {
               </select>
             </div>
           </div>
-          
+
           <div className="flex items-end">
             <button
               type="submit"
@@ -118,7 +138,7 @@ const Users = () => {
           </div>
         </form>
       </div>
-      
+
       {/* Users Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -191,14 +211,14 @@ const Users = () => {
                     {error}
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : users && users.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-4 text-center">
                     No users found
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                users && users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -245,16 +265,16 @@ const Users = () => {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
-        {totalPages > 1 && (
+        {totalElements > 0 && (
           <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 0}
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                disabled={currentPage <= 1}
                 className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage === 0
+                  currentPage <= 1
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
@@ -263,9 +283,9 @@ const Users = () => {
               </button>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages - 1}
+                disabled={currentPage >= totalPages}
                 className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage === totalPages - 1
+                  currentPage >= totalPages
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
@@ -276,80 +296,88 @@ const Users = () => {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{currentPage * pageSize + 1}</span> to{' '}
-                  <span className="font-medium">
-                    {Math.min((currentPage + 1) * pageSize, totalElements)}
-                  </span>{' '}
-                  of <span className="font-medium">{totalElements}</span> results
+                  {totalElements === 0 ? (
+                    <span>No results found</span>
+                  ) : (
+                    <>
+                      Showing <span className="font-medium">{totalElements > 0 ? ((currentPage - 1) * pageSize) + 1 : 0}</span> to{' '}
+                      <span className="font-medium">
+                        {Math.min(currentPage * pageSize, totalElements)}
+                      </span>{' '}
+                      of <span className="font-medium">{totalElements}</span> results
+                    </>
+                  )}
                 </p>
               </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 0}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                      currentPage === 0
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="sr-only">Previous</span>
-                    <svg
-                      className="h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                  
-                  {[...Array(totalPages).keys()].map((page) => (
+              {totalPages > 1 && (
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                     <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === page
-                          ? 'z-10 bg-primary-50 border-primary-500 text-primary-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage <= 1}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                        currentPage <= 1
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-500 hover:bg-gray-50'
                       }`}
                     >
-                      {page + 1}
+                      <span className="sr-only">Previous</span>
+                      <svg
+                        className="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </button>
-                  ))}
-                  
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages - 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                      currentPage === totalPages - 1
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="sr-only">Next</span>
-                    <svg
-                      className="h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
+
+                    {totalPages > 0 && [...Array(totalPages).keys()].map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page + 1)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === page + 1
+                            ? 'z-10 bg-primary-50 border-primary-500 text-primary-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page + 1}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage >= totalPages}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                        currentPage >= totalPages
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-500 hover:bg-gray-50'
+                      }`}
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </nav>
-              </div>
+                      <span className="sr-only">Next</span>
+                      <svg
+                        className="h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </div>
+              )}
             </div>
           </div>
         )}

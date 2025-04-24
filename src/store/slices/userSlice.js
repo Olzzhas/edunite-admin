@@ -4,11 +4,85 @@ import { userService } from '../../services/api';
 // Async thunks
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
-  async ({ page = 0, size = 10, filters = {} }, { rejectWithValue }) => {
+  async ({ page = 1, size = 10, filters = {} }, { rejectWithValue }) => {
     try {
+      console.log('fetchUsers thunk called with filters:', filters);
       const response = await userService.getUsers(page, size, filters);
+
+      // Handle the specific API response format
+      if (response && response.users) {
+        console.log('Received API response:', response);
+
+        let filteredUsers = [...response.users];
+
+        // Apply client-side role filtering if needed
+        if (filters.role && filters.role !== '') {
+          console.log('Applying client-side role filtering for:', filters.role);
+          filteredUsers = filteredUsers.filter(user =>
+            user.role && user.role.toLowerCase() === filters.role.toLowerCase()
+          );
+        }
+
+        // Transform the API response to match our expected format with client-side filtered users
+        return {
+          content: filteredUsers,
+          totalElements: filteredUsers.length, // Update count based on filtered results
+          totalPages: Math.ceil(filteredUsers.length / size),
+          size: response.page_size,
+          number: response.current_page,
+        };
+      }
+
+      // Ensure we have a valid response with required fields
+      if (!response || (!response.content && !response.users)) {
+        console.warn('Invalid response format from API, creating default response');
+        return {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          size,
+          number: page,
+        };
+      }
+
+      // If we have content instead of users, apply client-side filtering
+      if (response.content) {
+        let filteredContent = [...response.content];
+
+        // Apply client-side role filtering if needed
+        if (filters.role && filters.role !== '') {
+          console.log('Applying client-side role filtering for:', filters.role);
+          filteredContent = filteredContent.filter(user =>
+            user.role && user.role.toLowerCase() === filters.role.toLowerCase()
+          );
+        }
+
+        // Update the response with filtered content
+        return {
+          ...response,
+          content: filteredContent,
+          totalElements: filteredContent.length,
+          totalPages: Math.ceil(filteredContent.length / size)
+        };
+      }
+
       return response;
     } catch (error) {
+      console.error('Error fetching users:', error);
+
+      // Return a default empty response instead of rejecting
+      // This prevents the UI from showing an error message when there are no users
+      if (error.response && error.response.status === 404) {
+        console.warn('No users found (404), returning empty list');
+        return {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          size,
+          number: page,
+        };
+      }
+
       return rejectWithValue(error.message || 'Failed to fetch users');
     }
   }
@@ -105,7 +179,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Fetch user by ID
       .addCase(fetchUserById.pending, (state) => {
         state.loading = true;
@@ -119,7 +193,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Create user
       .addCase(createUser.pending, (state) => {
         state.loading = true;
@@ -134,7 +208,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update user
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
@@ -154,7 +228,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Delete user
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;

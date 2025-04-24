@@ -37,37 +37,37 @@ const MOCK_USERS = [
   },
 ];
 
-// For development/testing - use mock data
-const MOCK_API = true;
+// Use real API data
+const MOCK_API = false;
 
 const userService = {
-  getUsers: async (page = 0, size = 10, filters = {}) => {
+  getUsers: async (page = 1, size = 10, filters = {}) => {
     if (MOCK_API) {
       // Filter mock users based on filters
       let filteredUsers = [...MOCK_USERS];
-      
-      if (filters.role) {
+
+      if (filters.role && filters.role !== '') {
         filteredUsers = filteredUsers.filter(user => user.role === filters.role);
       }
-      
-      if (filters.email) {
-        filteredUsers = filteredUsers.filter(user => 
+
+      if (filters.email && filters.email !== '') {
+        filteredUsers = filteredUsers.filter(user =>
           user.email.toLowerCase().includes(filters.email.toLowerCase())
         );
       }
-      
-      if (filters.name) {
-        filteredUsers = filteredUsers.filter(user => 
+
+      if (filters.name && filters.name !== '') {
+        filteredUsers = filteredUsers.filter(user =>
           user.name.toLowerCase().includes(filters.name.toLowerCase()) ||
           user.surname.toLowerCase().includes(filters.name.toLowerCase())
         );
       }
-      
+
       // Paginate
       const start = page * size;
       const end = start + size;
       const paginatedUsers = filteredUsers.slice(start, end);
-      
+
       return {
         content: paginatedUsers,
         totalElements: filteredUsers.length,
@@ -76,19 +76,122 @@ const userService = {
         number: page,
       };
     } else {
-      // Build query params
-      const params = { page, size };
-      
-      // Add filters to params
-      if (filters.role) params.role = filters.role;
-      if (filters.email) params.email = filters.email;
-      if (filters.name) params.name = filters.name;
-      
-      const response = await apiClient.get('/user/users', { params });
-      return response.data;
+      try {
+        // Build query params according to the API requirements
+        const params = {
+          page: page,
+          page_size: size,
+          sort: '-created_at'  // Default sort by created_at descending
+        };
+
+        // Combine email and name filters into a single search parameter if either exists
+        if ((filters.email && filters.email !== '') || (filters.name && filters.name !== '')) {
+          params.search = filters.email || filters.name;
+        }
+
+        console.log('API request params:', params);
+
+        const response = await apiClient.get('/user/users', { params });
+
+        // Handle case where API returns null, undefined, or non-standard response
+        if (!response.data || typeof response.data !== 'object') {
+          console.warn('API returned invalid data format, normalizing response');
+          return {
+            content: [],
+            totalElements: 0,
+            totalPages: 0,
+            size,
+            number: page,
+          };
+        }
+
+        // Handle the specific API response format with users array
+        if (response.data.users) {
+          console.log('Received API response with users array');
+          return response.data;
+        }
+
+        // Handle case where API returns array instead of paginated object
+        if (Array.isArray(response.data)) {
+          console.warn('API returned array instead of paginated object, normalizing response');
+          const content = response.data;
+          return {
+            users: content,
+            current_page: page,
+            page_size: size,
+            first_page: 1,
+            last_page: Math.ceil(content.length / size),
+            total_records: content.length,
+          };
+        }
+
+        // Handle case where API returns paginated object but missing some fields
+        if (!response.data.users && !response.data.content) {
+          response.data.users = [];
+        }
+
+        if (response.data.total_records === undefined && response.data.totalElements === undefined) {
+          response.data.total_records = response.data.users ? response.data.users.length : 0;
+        }
+
+        if (response.data.last_page === undefined && response.data.totalPages === undefined) {
+          response.data.last_page = Math.ceil((response.data.total_records || 0) / size);
+        }
+
+        if (response.data.page_size === undefined && response.data.size === undefined) {
+          response.data.page_size = size;
+        }
+
+        if (response.data.current_page === undefined && response.data.number === undefined) {
+          response.data.current_page = page;
+        }
+
+        return response.data;
+      } catch (error) {
+        // If there's a connection error, fall back to mock data
+        if (error.isConnectionError) {
+          console.warn('API connection error, falling back to mock data for users');
+
+          // Use the mock implementation as fallback
+          let filteredUsers = [...MOCK_USERS];
+
+          if (filters.role && filters.role !== '') {
+            filteredUsers = filteredUsers.filter(user => user.role === filters.role);
+          }
+
+          if (filters.email && filters.email !== '') {
+            filteredUsers = filteredUsers.filter(user =>
+              user.email.toLowerCase().includes(filters.email.toLowerCase())
+            );
+          }
+
+          if (filters.name && filters.name !== '') {
+            filteredUsers = filteredUsers.filter(user =>
+              user.name.toLowerCase().includes(filters.name.toLowerCase()) ||
+              user.surname.toLowerCase().includes(filters.name.toLowerCase())
+            );
+          }
+
+          // Paginate
+          const start = page * size;
+          const end = start + size;
+          const paginatedUsers = filteredUsers.slice(start, end);
+
+          return {
+            content: paginatedUsers,
+            totalElements: filteredUsers.length,
+            totalPages: Math.ceil(filteredUsers.length / size),
+            size,
+            number: page,
+          };
+        }
+
+        // Re-throw other errors
+        throw error;
+      }
     }
   },
-  
+
   getUserById: async (id) => {
     if (MOCK_API) {
       const user = MOCK_USERS.find(u => u.id === parseInt(id));
@@ -99,12 +202,12 @@ const userService = {
       return response.data;
     }
   },
-  
+
   createUser: async (userData) => {
     if (MOCK_API) {
       // Generate a new ID
       const newId = Math.max(...MOCK_USERS.map(u => u.id)) + 1;
-      
+
       // Create new user
       const newUser = {
         id: newId,
@@ -114,22 +217,22 @@ const userService = {
         version: 1,
         ...userData,
       };
-      
+
       // Add to mock data
       MOCK_USERS.push(newUser);
-      
+
       return newUser;
     } else {
       const response = await apiClient.post('/user', userData);
       return response.data;
     }
   },
-  
+
   updateUser: async (id, userData) => {
     if (MOCK_API) {
       const index = MOCK_USERS.findIndex(u => u.id === parseInt(id));
       if (index === -1) throw new Error('User not found');
-      
+
       // Update user
       const updatedUser = {
         ...MOCK_USERS[index],
@@ -137,25 +240,25 @@ const userService = {
         updatedAt: new Date().toISOString(),
         version: MOCK_USERS[index].version + 1,
       };
-      
+
       // Replace in mock data
       MOCK_USERS[index] = updatedUser;
-      
+
       return updatedUser;
     } else {
       const response = await apiClient.put(`/user/${id}`, userData);
       return response.data;
     }
   },
-  
+
   deleteUser: async (id) => {
     if (MOCK_API) {
       const index = MOCK_USERS.findIndex(u => u.id === parseInt(id));
       if (index === -1) throw new Error('User not found');
-      
+
       // Remove from mock data
       MOCK_USERS.splice(index, 1);
-      
+
       return { success: true };
     } else {
       const response = await apiClient.delete(`/user/${id}`);

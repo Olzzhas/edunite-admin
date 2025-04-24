@@ -46,8 +46,8 @@ const MOCK_SEMESTERS = [
   },
 ];
 
-// For development/testing - use mock data
-const MOCK_API = true;
+// Use real API data
+const MOCK_API = false;
 
 const semesterService = {
   getSemesters: async () => {
@@ -58,7 +58,7 @@ const semesterService = {
       return response.data;
     }
   },
-  
+
   getSemesterById: async (id) => {
     if (MOCK_API) {
       const semester = MOCK_SEMESTERS.find(s => s.id === parseInt(id));
@@ -69,125 +69,125 @@ const semesterService = {
       return response.data;
     }
   },
-  
+
   createSemester: async (semesterData) => {
     if (MOCK_API) {
       // Generate a new ID
       const newId = Math.max(...MOCK_SEMESTERS.map(s => s.id)) + 1;
-      
+
       // Create new semester
       const newSemester = {
         id: newId,
         breaks: [],
         ...semesterData,
       };
-      
+
       // Add to mock data
       MOCK_SEMESTERS.push(newSemester);
-      
+
       return newSemester;
     } else {
       const response = await apiClient.post('/semester', semesterData);
       return response.data;
     }
   },
-  
+
   updateSemester: async (id, semesterData) => {
     if (MOCK_API) {
       const index = MOCK_SEMESTERS.findIndex(s => s.id === parseInt(id));
       if (index === -1) throw new Error('Semester not found');
-      
+
       // Update semester
       const updatedSemester = {
         ...MOCK_SEMESTERS[index],
         ...semesterData,
       };
-      
+
       // Replace in mock data
       MOCK_SEMESTERS[index] = updatedSemester;
-      
+
       return updatedSemester;
     } else {
       const response = await apiClient.put(`/semester/${id}`, semesterData);
       return response.data;
     }
   },
-  
+
   deleteSemester: async (id) => {
     if (MOCK_API) {
       const index = MOCK_SEMESTERS.findIndex(s => s.id === parseInt(id));
       if (index === -1) throw new Error('Semester not found');
-      
+
       // Remove from mock data
       MOCK_SEMESTERS.splice(index, 1);
-      
+
       return { success: true };
     } else {
       const response = await apiClient.delete(`/semester/${id}`);
       return response.data;
     }
   },
-  
+
   addBreak: async (semesterId, breakData) => {
     if (MOCK_API) {
       const semesterIndex = MOCK_SEMESTERS.findIndex(s => s.id === parseInt(semesterId));
       if (semesterIndex === -1) throw new Error('Semester not found');
-      
+
       // Generate a new ID for the break
       const breakIds = MOCK_SEMESTERS.flatMap(s => s.breaks.map(b => b.id));
       const newBreakId = breakIds.length > 0 ? Math.max(...breakIds) + 1 : 1;
-      
+
       // Create new break
       const newBreak = {
         id: newBreakId,
         ...breakData,
       };
-      
+
       // Add to semester
       MOCK_SEMESTERS[semesterIndex].breaks.push(newBreak);
-      
+
       return newBreak;
     } else {
       const response = await apiClient.post(`/semester/${semesterId}/breaks`, breakData);
       return response.data;
     }
   },
-  
+
   updateBreak: async (semesterId, breakId, breakData) => {
     if (MOCK_API) {
       const semesterIndex = MOCK_SEMESTERS.findIndex(s => s.id === parseInt(semesterId));
       if (semesterIndex === -1) throw new Error('Semester not found');
-      
+
       const breakIndex = MOCK_SEMESTERS[semesterIndex].breaks.findIndex(b => b.id === parseInt(breakId));
       if (breakIndex === -1) throw new Error('Break not found');
-      
+
       // Update break
       const updatedBreak = {
         ...MOCK_SEMESTERS[semesterIndex].breaks[breakIndex],
         ...breakData,
       };
-      
+
       // Replace in mock data
       MOCK_SEMESTERS[semesterIndex].breaks[breakIndex] = updatedBreak;
-      
+
       return updatedBreak;
     } else {
       const response = await apiClient.put(`/semester/${semesterId}/breaks/${breakId}`, breakData);
       return response.data;
     }
   },
-  
+
   deleteBreak: async (semesterId, breakId) => {
     if (MOCK_API) {
       const semesterIndex = MOCK_SEMESTERS.findIndex(s => s.id === parseInt(semesterId));
       if (semesterIndex === -1) throw new Error('Semester not found');
-      
+
       const breakIndex = MOCK_SEMESTERS[semesterIndex].breaks.findIndex(b => b.id === parseInt(breakId));
       if (breakIndex === -1) throw new Error('Break not found');
-      
+
       // Remove from mock data
       MOCK_SEMESTERS[semesterIndex].breaks.splice(breakIndex, 1);
-      
+
       return { success: true };
     } else {
       const response = await apiClient.delete(`/semester/${semesterId}/breaks/${breakId}`);
