@@ -47,8 +47,38 @@ const courseService = {
         number: page,
       };
     } else {
-      const response = await apiClient.get('/course', { params: { page, size } });
-      return response.data;
+      try {
+        // Build query params
+        const params = {
+          page: page,
+          page_size: size,
+          sort: '-created_at'  // Default sort by created_at descending
+        };
+
+        console.log('API request params for courses:', params);
+
+        const response = await apiClient.get('/course', { params });
+
+        // Log the raw API response for debugging
+        console.log('Raw API response for courses:', response.data);
+
+        // Check if the response has the expected format
+        if (response.data && response.data.courses) {
+          // Transform the API response to match our expected format
+          return {
+            content: response.data.courses,
+            totalElements: response.data.courses.length,
+            totalPages: Math.ceil(response.data.courses.length / size),
+            size: size,
+            number: page,
+          };
+        }
+
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        throw error;
+      }
     }
   },
 

@@ -3,6 +3,37 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '../store/slices/userSlice';
 import { FiUser, FiSearch, FiFilter } from 'react-icons/fi';
 
+// Helper function to format dates safely
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+
+  try {
+    // Log the date string for debugging
+    console.log('Formatting date string:', dateString);
+
+    // Handle ISO format (e.g., "2025-03-27T12:18:45Z")
+    const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date detected:', dateString);
+      return 'Invalid Date';
+    }
+
+    // Format the date as MM/DD/YYYY
+    const options = {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    };
+
+    return date.toLocaleDateString(undefined, options);
+  } catch (error) {
+    console.error('Error formatting date:', error, 'for date string:', dateString);
+    return 'Invalid Date';
+  }
+};
+
 const Users = () => {
   const dispatch = useDispatch();
   const { users, totalElements, totalPages, pageSize, loading, error } = useSelector(
@@ -261,7 +292,7 @@ const Users = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {formatDate(user.created_at || user.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button className="text-primary-600 hover:text-primary-900 mr-3">

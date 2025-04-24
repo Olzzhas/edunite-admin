@@ -6,9 +6,25 @@ export const fetchCourses = createAsyncThunk(
   'courses/fetchCourses',
   async ({ page = 0, size = 10 }, { rejectWithValue }) => {
     try {
+      console.log('Fetching courses with page:', page, 'size:', size);
       const response = await courseService.getCourses(page, size);
+
+      console.log('Courses response in thunk:', response);
+
+      // Ensure we have a valid response
+      if (!response) {
+        return {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          size,
+          number: page,
+        };
+      }
+
       return response;
     } catch (error) {
+      console.error('Error in fetchCourses thunk:', error);
       return rejectWithValue(error.message || 'Failed to fetch courses');
     }
   }
@@ -117,7 +133,7 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Fetch course by ID
       .addCase(fetchCourseById.pending, (state) => {
         state.loading = true;
@@ -131,7 +147,7 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Create course
       .addCase(createCourse.pending, (state) => {
         state.loading = true;
@@ -146,7 +162,7 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update course
       .addCase(updateCourse.pending, (state) => {
         state.loading = true;
@@ -166,7 +182,7 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Delete course
       .addCase(deleteCourse.pending, (state) => {
         state.loading = true;
@@ -184,7 +200,7 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Upload course banner
       .addCase(uploadCourseBanner.pending, (state) => {
         state.loading = true;
@@ -193,12 +209,12 @@ const courseSlice = createSlice({
       .addCase(uploadCourseBanner.fulfilled, (state, action) => {
         state.loading = false;
         const { id, bannerImageUrl } = action.payload;
-        
+
         const index = state.courses.findIndex(course => course.id === id);
         if (index !== -1) {
           state.courses[index].bannerImageUrl = bannerImageUrl;
         }
-        
+
         if (state.selectedCourse && state.selectedCourse.id === id) {
           state.selectedCourse.bannerImageUrl = bannerImageUrl;
         }

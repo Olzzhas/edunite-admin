@@ -98,6 +98,17 @@ const userService = {
         // Log the raw API response for debugging
         console.log('Raw API response:', response.data);
 
+        // Check the date format in the first user (if available)
+        if (response.data && response.data.users && response.data.users.length > 0) {
+          const firstUser = response.data.users[0];
+          console.log('First user date format:', {
+            created_at: firstUser.created_at,
+            createdAt: firstUser.createdAt,
+            updatedAt: firstUser.updatedAt,
+            updated_at: firstUser.updated_at
+          });
+        }
+
         // Handle case where API returns null, undefined, or non-standard response
         if (!response.data || typeof response.data !== 'object') {
           console.warn('API returned invalid data format, normalizing response');
