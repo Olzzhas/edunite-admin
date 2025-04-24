@@ -125,15 +125,15 @@ const NotificationsPanel = () => {
   ];
 
   return (
-    <div className="h-full">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">Notifications</h2>
+    <div className="h-full notification-panel">
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-semibold">Notifications</h2>
       </div>
 
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-gray-700">Today</h3>
-          <span className="text-xs text-gray-500">
+          <h3 className="text-sm font-medium">Today</h3>
+          <span className="text-xs text-tertiary">
             <FiClock className="inline mr-1" size={12} />
           </span>
         </div>
@@ -145,16 +145,16 @@ const NotificationsPanel = () => {
                 {notification.icon}
               </div>
               <div>
-                <p className="text-sm text-gray-800">{notification.title}</p>
-                <p className="text-xs text-gray-500">{notification.time}</p>
+                <p className="text-sm">{notification.title}</p>
+                <p className="text-xs text-tertiary">{notification.time}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">Activities</h3>
+      <div className="p-4 border-b">
+        <h3 className="text-sm font-medium mb-4">Activities</h3>
         <div className="space-y-3">
           {activities.map((activity) => (
             <div key={activity.id} className="flex items-start">
@@ -162,8 +162,8 @@ const NotificationsPanel = () => {
                 {activity.user.avatar}
               </div>
               <div>
-                <p className="text-sm text-gray-800">{activity.title}</p>
-                <p className="text-xs text-gray-500">{activity.time}</p>
+                <p className="text-sm">{activity.title}</p>
+                <p className="text-xs text-tertiary">{activity.time}</p>
               </div>
             </div>
           ))}
@@ -171,14 +171,14 @@ const NotificationsPanel = () => {
       </div>
 
       <div className="p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">Contacts</h3>
+        <h3 className="text-sm font-medium mb-4">Contacts</h3>
         <div className="space-y-3">
           {contacts.map((contact) => (
             <div key={contact.id} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${contact.color}`}>
                 {contact.avatar}
               </div>
-              <p className="text-sm text-gray-800">{contact.name}</p>
+              <p className="text-sm">{contact.name}</p>
             </div>
           ))}
         </div>

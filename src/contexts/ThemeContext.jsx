@@ -31,8 +31,20 @@ export const ThemeProvider = ({ children }) => {
 
   // Apply theme to document when it changes
   useEffect(() => {
+    // Set the data-theme attribute
     document.documentElement.setAttribute('data-theme', theme);
+
+    // Also add/remove the 'dark' class for Tailwind dark mode
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Save theme preference
     localStorage.setItem('theme', theme);
+
+    console.log('Theme changed to:', theme);
   }, [theme]);
 
   // Listen for system theme changes
