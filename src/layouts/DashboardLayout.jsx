@@ -17,7 +17,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-secondary">
       <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
 
       <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
@@ -29,7 +29,7 @@ const DashboardLayout = () => {
           </main>
 
           {showNotifications && (
-            <aside className="w-80 border-l border-gray-200 h-[calc(100vh-64px)] bg-white overflow-auto">
+            <aside className="w-80 border-l h-[calc(100vh-64px)] card overflow-auto">
               <NotificationsPanel />
             </aside>
           )}

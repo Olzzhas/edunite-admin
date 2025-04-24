@@ -46,7 +46,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
   ];
 
   return (
-    <div className={`bg-white text-gray-700 h-screen ${collapsed ? 'w-20' : 'w-64'} transition-all duration-300 fixed left-0 top-0 z-10 border-r border-gray-200`}>
+    <div className={`sidebar h-screen ${collapsed ? 'w-20' : 'w-64'} transition-all duration-300 fixed left-0 top-0 z-10 border-r`}>
       <div className="flex justify-between items-center p-5">
         {!collapsed && (
           <div className="flex items-center">
@@ -55,7 +55,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
         )}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-md hover:bg-gray-100 focus:outline-none text-gray-500"
+          className="p-2 rounded-md hover:bg-tertiary focus:outline-none"
         >
           {collapsed ? <FiMenu size={20} /> : <FiX size={20} />}
         </button>
@@ -65,7 +65,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
         {categories.map((category, categoryIndex) => (
           <div key={categoryIndex} className="mb-6">
             {!collapsed && (
-              <h3 className="text-xs uppercase text-gray-500 font-medium mb-2 px-2">{category.title}</h3>
+              <h3 className="text-xs uppercase text-tertiary font-medium mb-2 px-2">{category.title}</h3>
             )}
             <nav>
               <ul className="space-y-1">
@@ -79,11 +79,11 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
                         to={item.path}
                         className={`flex items-center py-2 px-3 rounded-lg ${
                           isActive
-                            ? 'bg-primary-50 text-primary-600'
-                            : 'hover:bg-gray-100 text-gray-700'
+                            ? 'bg-primary-100 text-primary-600'
+                            : 'hover:bg-tertiary'
                         } transition-colors`}
                       >
-                        <span className={`text-${isActive ? 'primary-600' : 'gray-500'} ${collapsed ? '' : 'mr-3'}`}>
+                        <span className={`${isActive ? 'text-primary-600' : 'text-tertiary'} ${collapsed ? '' : 'mr-3'}`}>
                           {item.icon}
                         </span>
                         {!collapsed && <span className={`${isActive ? 'font-medium' : ''}`}>{item.name}</span>}

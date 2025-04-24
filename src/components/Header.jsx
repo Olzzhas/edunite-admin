@@ -1,7 +1,8 @@
-import { FiBell, FiSearch, FiUser, FiMenu, FiBookmark, FiSun, FiLogOut } from 'react-icons/fi';
+import { FiBell, FiSearch, FiUser, FiMenu, FiBookmark, FiLogOut } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { useState, useRef, useEffect } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 const Header = ({ toggleSidebar, toggleNotifications }) => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const Header = ({ toggleSidebar, toggleNotifications }) => {
   };
 
   return (
-    <header className="bg-white h-16 flex items-center justify-between px-6 sticky top-0 z-10 border-b border-gray-200">
+    <header className="header h-16 flex items-center justify-between px-6 sticky top-0 z-10 border-b">
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
@@ -54,9 +55,7 @@ const Header = ({ toggleSidebar, toggleNotifications }) => {
           />
         </div>
 
-        <button className="p-2 rounded-md hover:bg-gray-100 focus:outline-none text-gray-500">
-          <FiSun size={20} />
-        </button>
+        <ThemeToggle />
 
         <button className="p-2 rounded-md hover:bg-gray-100 focus:outline-none text-gray-500">
           <FiBookmark size={20} />
@@ -89,23 +88,17 @@ const Header = ({ toggleSidebar, toggleNotifications }) => {
 
           {/* User dropdown menu */}
           {userMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-200">
-              <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-              </div>
-
-              <div className="py-1">
-                <div className="px-4 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Mock Auth Enabled
-                </div>
+            <div className="absolute right-0 top-full mt-2 w-48 card rounded-md shadow-lg py-1 z-20 border">
+              <div className="px-4 py-2 border-b">
+                <p className="text-sm font-medium">{user?.name}</p>
+                <p className="text-xs text-tertiary truncate">{user?.email}</p>
               </div>
 
               <button
                 onClick={handleLogout}
-                className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex w-full items-center px-4 py-2 text-sm hover:bg-tertiary"
               >
-                <FiLogOut className="mr-2 h-4 w-4 text-gray-500" />
+                <FiLogOut className="mr-2 h-4 w-4" />
                 Sign out
               </button>
             </div>

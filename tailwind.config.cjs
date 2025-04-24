@@ -4,21 +4,34 @@ module.exports = {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // Enable dark mode with class strategy
   theme: {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: 'var(--primary-50)',
+          100: 'var(--primary-100)',
+          200: 'var(--primary-200)',
+          300: 'var(--primary-300)',
+          400: 'var(--primary-400)',
+          500: 'var(--primary-500)',
+          600: 'var(--primary-600)',
+          700: 'var(--primary-700)',
+          800: 'var(--primary-800)',
+          900: 'var(--primary-900)',
         },
+        // Theme-based colors
+        bg: {
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          tertiary: 'var(--bg-tertiary)',
+        },
+        text: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+        },
+        // For backward compatibility
         gray: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -32,11 +45,33 @@ module.exports = {
           900: '#111827',
         }
       },
+      backgroundColor: {
+        primary: 'var(--bg-primary)',
+        secondary: 'var(--bg-secondary)',
+        tertiary: 'var(--bg-tertiary)',
+        card: 'var(--card-bg)',
+        input: 'var(--input-bg)',
+      },
+      textColor: {
+        primary: 'var(--text-primary)',
+        secondary: 'var(--text-secondary)',
+        tertiary: 'var(--text-tertiary)',
+      },
+      borderColor: {
+        DEFAULT: 'var(--border-color)',
+        light: 'var(--border-color-light)',
+        input: 'var(--input-border)',
+        'input-focus': 'var(--input-focus-border)',
+      },
       borderRadius: {
         'xl': '1rem',
         '2xl': '1.5rem',
       },
       boxShadow: {
+        'sm': 'var(--shadow-sm)',
+        DEFAULT: 'var(--shadow)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
         'card': '0 2px 5px 0 rgba(0, 0, 0, 0.05)',
         'card-hover': '0 5px 15px 0 rgba(0, 0, 0, 0.07)',
       }

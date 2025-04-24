@@ -1,0 +1,141 @@
+/* Theme variables */
+:root {
+  /* Light theme (default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  
+  --border-color: #e5e7eb;
+  --border-color-light: #f3f4f6;
+  
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-200: #bae6fd;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --primary-900: #0c4a6e;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus-border: #0ea5e9;
+  
+  --header-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  
+  /* Transition for smooth theme switching */
+  --transition-speed: 0.3s;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-tertiary: #d1d5db;
+  
+  --border-color: #374151;
+  --border-color-light: #4b5563;
+  
+  --primary-50: #0c4a6e;
+  --primary-100: #075985;
+  --primary-200: #0369a1;
+  --primary-300: #0284c7;
+  --primary-400: #0ea5e9;
+  --primary-500: #38bdf8;
+  --primary-600: #7dd3fc;
+  --primary-700: #bae6fd;
+  --primary-800: #e0f2fe;
+  --primary-900: #f0f9ff;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  
+  --card-bg: #1f2937;
+  --input-bg: #374151;
+  --input-border: #4b5563;
+  --input-focus-border: #38bdf8;
+  
+  --header-bg: #1f2937;
+  --sidebar-bg: #1f2937;
+}
+
+/* Apply theme variables to elements */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* Card styles */
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+/* Input styles */
+input, select, textarea {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--input-focus-border);
+}
+
+/* Button styles */
+button {
+  transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
+}
+
+/* Header and sidebar */
+.header {
+  background-color: var(--header-bg);
+  border-bottom-color: var(--border-color);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.sidebar {
+  background-color: var(--sidebar-bg);
+  border-right-color: var(--border-color);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+/* Table styles */
+table {
+  border-color: var(--border-color);
+  transition: border-color var(--transition-speed);
+}
+
+th, td {
+  border-color: var(--border-color-light);
+  transition: border-color var(--transition-speed);
+}
+
+/* Divider */
+hr {
+  border-color: var(--border-color);
+  transition: border-color var(--transition-speed);
+}
