@@ -6,9 +6,24 @@ export const fetchSemesters = createAsyncThunk(
   'semesters/fetchSemesters',
   async (_, { rejectWithValue }) => {
     try {
+      console.log('Fetching semesters...');
       const response = await semesterService.getSemesters();
+      console.log('Semesters response in thunk:', response);
+
+      // If response is an array, return it directly
+      if (Array.isArray(response)) {
+        return response;
+      }
+
+      // If response is an object with a semesters property, return that
+      if (response && response.semesters) {
+        return response.semesters;
+      }
+
+      // Otherwise, return the response as is
       return response;
     } catch (error) {
+      console.error('Error in fetchSemesters thunk:', error);
       return rejectWithValue(error.message || 'Failed to fetch semesters');
     }
   }
@@ -18,9 +33,19 @@ export const fetchSemesterById = createAsyncThunk(
   'semesters/fetchSemesterById',
   async (id, { rejectWithValue }) => {
     try {
+      console.log(`Fetching semester with ID ${id}...`);
       const response = await semesterService.getSemesterById(id);
+      console.log(`Semester ${id} response in thunk:`, response);
+
+      // If response is an object with a semester property, return that
+      if (response && response.semester) {
+        return response.semester;
+      }
+
+      // Otherwise, return the response as is
       return response;
     } catch (error) {
+      console.error(`Error in fetchSemesterById thunk for ID ${id}:`, error);
       return rejectWithValue(error.message || 'Failed to fetch semester');
     }
   }
@@ -30,9 +55,12 @@ export const createSemester = createAsyncThunk(
   'semesters/createSemester',
   async (semesterData, { rejectWithValue }) => {
     try {
+      console.log('Creating semester in thunk:', semesterData);
       const response = await semesterService.createSemester(semesterData);
+      console.log('Create semester response:', response);
       return response;
     } catch (error) {
+      console.error('Error in createSemester thunk:', error);
       return rejectWithValue(error.message || 'Failed to create semester');
     }
   }
@@ -66,9 +94,17 @@ export const addSemesterBreak = createAsyncThunk(
   'semesters/addSemesterBreak',
   async ({ semesterId, breakData }, { rejectWithValue }) => {
     try {
+      console.log('Adding semester break in thunk:', { semesterId, breakData });
       const response = await semesterService.addBreak(semesterId, breakData);
-      return { semesterId, break: response };
+      console.log('Add semester break response:', response);
+
+      // Return the response in a format that the reducer expects
+      return {
+        semesterId,
+        break: response
+      };
     } catch (error) {
+      console.error('Error in addSemesterBreak thunk:', error);
       return rejectWithValue(error.message || 'Failed to add semester break');
     }
   }
@@ -133,7 +169,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Fetch semester by ID
       .addCase(fetchSemesterById.pending, (state) => {
         state.loading = true;
@@ -147,7 +183,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Create semester
       .addCase(createSemester.pending, (state) => {
         state.loading = true;
@@ -161,7 +197,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update semester
       .addCase(updateSemester.pending, (state) => {
         state.loading = true;
@@ -181,7 +217,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Delete semester
       .addCase(deleteSemester.pending, (state) => {
         state.loading = true;
@@ -198,7 +234,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Add semester break
       .addCase(addSemesterBreak.pending, (state) => {
         state.loading = true;
@@ -207,12 +243,12 @@ const semesterSlice = createSlice({
       .addCase(addSemesterBreak.fulfilled, (state, action) => {
         state.loading = false;
         const { semesterId, break: newBreak } = action.payload;
-        
+
         const semesterIndex = state.semesters.findIndex(semester => semester.id === semesterId);
         if (semesterIndex !== -1) {
           state.semesters[semesterIndex].breaks.push(newBreak);
         }
-        
+
         if (state.selectedSemester && state.selectedSemester.id === semesterId) {
           state.selectedSemester.breaks.push(newBreak);
         }
@@ -221,7 +257,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update semester break
       .addCase(updateSemesterBreak.pending, (state) => {
         state.loading = true;
@@ -230,7 +266,7 @@ const semesterSlice = createSlice({
       .addCase(updateSemesterBreak.fulfilled, (state, action) => {
         state.loading = false;
         const { semesterId, break: updatedBreak } = action.payload;
-        
+
         const semesterIndex = state.semesters.findIndex(semester => semester.id === semesterId);
         if (semesterIndex !== -1) {
           const breakIndex = state.semesters[semesterIndex].breaks.findIndex(
@@ -240,7 +276,7 @@ const semesterSlice = createSlice({
             state.semesters[semesterIndex].breaks[breakIndex] = updatedBreak;
           }
         }
-        
+
         if (state.selectedSemester && state.selectedSemester.id === semesterId) {
           const breakIndex = state.selectedSemester.breaks.findIndex(
             b => b.id === updatedBreak.id
@@ -254,7 +290,7 @@ const semesterSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Delete semester break
       .addCase(deleteSemesterBreak.pending, (state) => {
         state.loading = true;
@@ -263,14 +299,14 @@ const semesterSlice = createSlice({
       .addCase(deleteSemesterBreak.fulfilled, (state, action) => {
         state.loading = false;
         const { semesterId, breakId } = action.payload;
-        
+
         const semesterIndex = state.semesters.findIndex(semester => semester.id === semesterId);
         if (semesterIndex !== -1) {
           state.semesters[semesterIndex].breaks = state.semesters[semesterIndex].breaks.filter(
             b => b.id !== breakId
           );
         }
-        
+
         if (state.selectedSemester && state.selectedSemester.id === semesterId) {
           state.selectedSemester.breaks = state.selectedSemester.breaks.filter(
             b => b.id !== breakId

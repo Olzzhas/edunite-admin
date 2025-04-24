@@ -1,7 +1,7 @@
 import apiClient from './apiClient';
 
-// Use real authentication
-const MOCK_AUTH = false;
+// Use mock authentication
+const MOCK_AUTH = true;
 const MOCK_ADMIN_USER = {
   id: 1,
   keycloakID: 'admin-123',

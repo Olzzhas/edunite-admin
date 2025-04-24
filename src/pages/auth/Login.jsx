@@ -9,16 +9,16 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       return;
     }
-    
+
     try {
       await dispatch(login({ email, password })).unwrap();
       navigate('/dashboard');
@@ -26,12 +26,12 @@ const Login = () => {
       // Error is handled in the reducer
     }
   };
-  
+
   // If already authenticated, redirect to dashboard
   if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
   }
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -43,7 +43,7 @@ const Login = () => {
             Admin Panel
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
             <div className="flex">
@@ -74,7 +74,7 @@ const Login = () => {
             </div>
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -120,7 +120,7 @@ const Login = () => {
               </div>
             </div>
           </div>
-          
+
           <div>
             <button
               type="submit"
@@ -156,11 +156,16 @@ const Login = () => {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
-          
+
           <div className="text-sm text-center">
-            <p className="text-gray-600">
-              For demo, use: <span className="font-medium">admin@edunite.com</span> / <span className="font-medium">admin</span>
-            </p>
+            <div className="p-4 bg-blue-50 rounded-md border border-blue-200 mt-4">
+              <p className="text-gray-700 font-medium mb-2">Mock Authentication Enabled</p>
+              <p className="text-gray-600">
+                Use these credentials: <br />
+                <span className="font-medium">Email:</span> admin@edunite.com <br />
+                <span className="font-medium">Password:</span> admin
+              </p>
+            </div>
           </div>
         </form>
       </div>
