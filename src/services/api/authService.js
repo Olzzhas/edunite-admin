@@ -1,67 +1,56 @@
 import apiClient from './apiClient';
 
-// Use mock authentication
-const MOCK_AUTH = true;
-const MOCK_ADMIN_USER = {
-  id: 1,
-  keycloakID: 'admin-123',
-  name: 'Admin',
-  surname: 'User',
-  email: 'admin@edunite.com',
-  role: 'admin',
-  createdAt: '2023-01-01T00:00:00Z',
-  updatedAt: '2023-01-01T00:00:00Z',
-  version: 1,
-};
-
-const MOCK_TOKENS = {
-  accessToken: 'mock-access-token',
-  refreshToken: 'mock-refresh-token',
-};
+// Authentication service for the admin panel
 
 const authService = {
   login: async (email, password) => {
-    if (MOCK_AUTH) {
-      // Mock login for development
-      if (email === 'admin@edunite.com' && password === 'admin') {
-        localStorage.setItem('accessToken', MOCK_TOKENS.accessToken);
-        localStorage.setItem('refreshToken', MOCK_TOKENS.refreshToken);
-        localStorage.setItem('user', JSON.stringify(MOCK_ADMIN_USER));
-        return { user: MOCK_ADMIN_USER, ...MOCK_TOKENS };
-      } else {
-        throw new Error('Invalid credentials');
+    try {
+      console.log('Logging in with credentials:', { username: email, password: '********' });
+
+      // Format credentials for the API
+      const loginData = {
+        username: email,
+        password: password
+      };
+
+      // API call
+      const response = await apiClient.post('/auth/login', loginData);
+      console.log('Login response:', response.data);
+
+      // Check if we have the expected data
+      if (!response.data || !response.data.access_token || !response.data.user) {
+        // Clear any existing tokens to ensure we're not in a half-authenticated state
+        authService.logout();
+        throw new Error('Invalid response from server');
       }
-    } else {
-      try {
-        // Real API call
-        const response = await apiClient.post('/auth/login', { email, password });
-        const { user, accessToken, refreshToken } = response.data;
 
-        // Store tokens and user data
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(user));
+      const { access_token, refresh_token, user } = response.data;
 
-        return response.data;
-      } catch (error) {
-        // If there's a connection error, fall back to mock auth
-        if (error.isConnectionError) {
-          console.warn('API connection error, falling back to mock authentication');
-
-          // Use mock authentication as fallback
-          if (email === 'admin@edunite.com' && password === 'admin') {
-            localStorage.setItem('accessToken', MOCK_TOKENS.accessToken);
-            localStorage.setItem('refreshToken', MOCK_TOKENS.refreshToken);
-            localStorage.setItem('user', JSON.stringify(MOCK_ADMIN_USER));
-            return { user: MOCK_ADMIN_USER, ...MOCK_TOKENS };
-          } else {
-            throw new Error('Invalid credentials');
-          }
-        }
-
-        // Re-throw other errors
-        throw error;
+      // Check if user has admin or moderator role
+      if (user.role !== 'admin' && user.role !== 'moderator') {
+        // Don't store tokens for non-admin users
+        console.warn('User does not have admin or moderator role:', user.role);
+        throw new Error('Access denied: Admin or moderator role required');
       }
+
+      // Store tokens and user data only if everything is valid
+      localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('refreshToken', refresh_token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      return response.data;
+    } catch (error) {
+      // Log the error for debugging
+      console.error('Login error:', error);
+
+      // Check if it's an API error with a response
+      if (error.response && error.response.data) {
+        // Use the error message from the API if available
+        throw new Error(error.response.data.error || 'Invalid credentials');
+      }
+
+      // Re-throw other errors with a more user-friendly message
+      throw new Error('Login failed. Please check your credentials and try again.');
     }
   },
 
@@ -72,18 +61,28 @@ const authService = {
   },
 
   refreshToken: async () => {
-    if (MOCK_AUTH) {
-      // Mock token refresh
-      return MOCK_TOKENS;
-    } else {
+    try {
       const refreshToken = localStorage.getItem('refreshToken');
-      const response = await apiClient.post('/auth/refresh', { refreshToken });
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
 
-      const { accessToken, refreshToken: newRefreshToken } = response.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', newRefreshToken);
+      console.log('Refreshing token...');
+
+      const response = await apiClient.post('/auth/refresh', { refresh_token: refreshToken });
+      console.log('Refresh token response:', response.data);
+
+      const { access_token, refresh_token } = response.data;
+
+      localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('refreshToken', refresh_token);
 
       return response.data;
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      // If refresh fails, log out the user
+      authService.logout();
+      throw error;
     }
   },
 
@@ -105,6 +104,12 @@ const authService = {
   hasRole: (role) => {
     const user = authService.getCurrentUser();
     return user && user.role === role;
+  },
+
+  // Check if user has admin or moderator role
+  hasAdminAccess: () => {
+    const user = authService.getCurrentUser();
+    return user && (user.role === 'admin' || user.role === 'moderator');
   },
 };
 

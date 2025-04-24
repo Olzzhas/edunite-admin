@@ -6,10 +6,17 @@ export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await authService.login(email, password);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.message || 'Login failed');
+      const res = await authService.login(email, password);
+
+      // пускаем только admin / moderator
+      if (res.user && (res.user.role === 'admin' || res.user.role === 'moderator')) {
+        return res;
+      }
+
+      // просто отклоняем: НИКАКИХ logout() и перезагрузок
+      return rejectWithValue('Unauthorized: admin or moderator access required');
+    } catch (err) {
+      return rejectWithValue(err.message || 'Login failed');
     }
   }
 );
@@ -50,6 +57,9 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -57,6 +67,8 @@ const authSlice = createSlice({
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.isAuthenticated = false;   // <<< сбрасываем сразу
+        state.user = null;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
@@ -66,14 +78,18 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.isAuthenticated = false;
+        state.user = null;
+        // чтобы токены не остались висеть
+        authService.logout();
       })
-      
+
       // Logout
       .addCase(logout.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
       })
-      
+
       // Refresh token
       .addCase(refreshToken.fulfilled, (state) => {
         state.isAuthenticated = true;
@@ -85,6 +101,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, setError } = authSlice.actions;
 
 export default authSlice.reducer;

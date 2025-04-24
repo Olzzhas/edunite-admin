@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { login, clearError } from '../../store/slices/authSlice';
+import { login, clearError, setError } from '../../store/slices/authSlice';
 import { FiUser, FiLock, FiAlertCircle } from 'react-icons/fi';
 
 const Login = () => {
@@ -15,20 +15,45 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prevent form submission if fields are empty
     if (!email || !password) {
+      dispatch(setError('Email and password are required'));
       return;
     }
 
     try {
-      await dispatch(login({ email, password })).unwrap();
-      navigate('/dashboard');
+      // Clear any previous errors
+      dispatch(clearError());
+
+      // Attempt login
+      const result = await dispatch(login({ email, password })).unwrap();
+
+      // Only navigate to dashboard if login was successful and we have user data
+      if (result && result.user) {
+        // Check if user has admin or moderator role
+        if (result.user.role === 'admin' || result.user.role === 'moderator') {
+          console.log('Login successful, navigating to dashboard');
+          navigate('/dashboard');
+        } else {
+          // If not admin/moderator, show error but don't navigate
+          dispatch(setError('Access denied: Admin or moderator role required'));
+        }
+      } else {
+        // If we don't have user data, show error
+        dispatch(setError('Invalid login response'));
+      }
     } catch (err) {
-      // Error is handled in the reducer
+      // Error is already handled in the reducer, but we'll log it for debugging
+      console.error('Login error:', err);
+
+      // Make sure we don't navigate anywhere - stay on login page to show error
+      // We don't need to do anything here as the error is already set in the reducer
     }
   };
 
-  // If already authenticated, redirect to dashboard
-  if (isAuthenticated) {
+  // Only redirect to dashboard if authenticated and there's no error
+  // This prevents the redirect loop when there's an error
+  if (isAuthenticated && !error) {
     return <Navigate to="/dashboard" />;
   }
 
@@ -45,13 +70,14 @@ const Login = () => {
         </div>
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+          <div className="bg-red-50 border border-red-300 rounded-md p-4 mb-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <FiAlertCircle className="h-5 w-5 text-red-500" />
               </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-red-800">Login Failed</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
               </div>
               <div className="ml-auto pl-3">
                 <div className="-mx-1.5 -my-1.5">
@@ -157,16 +183,7 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="text-sm text-center">
-            <div className="p-4 bg-blue-50 rounded-md border border-blue-200 mt-4">
-              <p className="text-gray-700 font-medium mb-2">Mock Authentication Enabled</p>
-              <p className="text-gray-600">
-                Use these credentials: <br />
-                <span className="font-medium">Email:</span> admin@edunite.com <br />
-                <span className="font-medium">Password:</span> admin
-              </p>
-            </div>
-          </div>
+
         </form>
       </div>
     </div>

@@ -5,6 +5,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
 import Login from './pages/auth/Login';
+import UnauthorizedPage from './pages/auth/Unauthorized';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css';
 
@@ -23,7 +24,7 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
-          <Route path="/unauthorized" element={<div className="p-6">Unauthorized access</div>} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Protected routes */}
           <Route path="/" element={<ProtectedRoute requiredRole="admin" />}>
