@@ -70,8 +70,27 @@ const threadService = {
         number: page,
       };
     } else {
-      const response = await apiClient.get('/thread', { params: { page, size } });
-      return response.data;
+      try {
+        const response = await apiClient.get('/thread', { params: { page, size } });
+
+        // Log the raw API response for debugging
+        console.log('Raw API response for threads:', response.data);
+
+        // Format the response to match the expected structure
+        // The API returns an array of threads directly
+        const threads = response.data;
+
+        return {
+          content: threads,
+          totalElements: threads.length,
+          totalPages: Math.ceil(threads.length / size),
+          size,
+          number: page,
+        };
+      } catch (error) {
+        console.error('Error fetching threads:', error);
+        throw error;
+      }
     }
   },
 
@@ -116,6 +135,58 @@ const threadService = {
     } else {
       const response = await apiClient.post('/thread', threadData);
       return response.data;
+    }
+  },
+
+  updateThread: async (id, threadData) => {
+    if (MOCK_API) {
+      const threadIndex = MOCK_THREADS.findIndex((t) => t.id === parseInt(id));
+      if (threadIndex === -1) throw new Error('Thread not found');
+
+      // Update thread
+      MOCK_THREADS[threadIndex] = {
+        ...MOCK_THREADS[threadIndex],
+        ...threadData,
+        updatedAt: new Date().toISOString(),
+      };
+
+      return MOCK_THREADS[threadIndex];
+    } else {
+      try {
+        console.log(`Updating thread ${id} with data:`, threadData);
+
+        // Create FormData object for the API request
+        const formData = new FormData();
+
+        // Ensure all required fields are included
+        formData.append('title', threadData.title || '');
+        formData.append('description', threadData.description || ''); // Description is required according to the error
+        formData.append('course_id', threadData.course_id || '');
+        formData.append('semester_id', threadData.semester_id || '');
+        formData.append('teacher_id', threadData.teacher_id || '');
+        formData.append('max_students', threadData.max_students || '0');
+
+        // Log the form data for debugging
+        console.log('Form data for thread update:');
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+
+        // Make the API request
+        const response = await apiClient.put(`/thread/${id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        // Log the response for debugging
+        console.log(`Update thread ${id} response:`, response.data);
+
+        return response.data;
+      } catch (error) {
+        console.error(`Error updating thread ${id}:`, error);
+        throw error;
+      }
     }
   },
 

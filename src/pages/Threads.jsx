@@ -1,44 +1,117 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchThreads } from '../store/slices/threadSlice';
+import { fetchThreads, updateThread } from '../store/slices/threadSlice';
 import { fetchCourses } from '../store/slices/courseSlice';
 import { fetchSemesters } from '../store/slices/semesterSlice';
-import { FiFilter, FiUsers, FiCalendar, FiClock, FiMapPin, FiPlus } from 'react-icons/fi';
+import { fetchUsers } from '../store/slices/userSlice';
+import { FiFilter, FiUsers, FiCalendar, FiClock, FiMapPin, FiPlus, FiBook, FiUser, FiEdit } from 'react-icons/fi';
+import { formatTimestamp } from '../utils/dateUtils';
+import EditThreadModal from '../components/modals/EditThreadModal';
 
 const Threads = () => {
   const dispatch = useDispatch();
-  const { threads, totalElements, totalPages, currentPage, pageSize, loading, error } = useSelector(
-    (state) => state.threads
-  );
+  const { threads, loading, error } = useSelector((state) => state.threads);
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 10; // Local page size
   const { courses } = useSelector((state) => state.courses);
   const { semesters } = useSelector((state) => state.semesters);
-  
+  const { users } = useSelector((state) => state.users);
+
+  // State for edit modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedThread, setSelectedThread] = useState(null);
+
+  // Get teachers from users
+  const teachers = users ? users.filter(user => user.role === 'teacher') : [];
+
   const [filters, setFilters] = useState({
     courseId: '',
     semesterId: '',
   });
-  
+
+  // State for client-side filtering
+  const [filteredThreads, setFilteredThreads] = useState([]);
+
   useEffect(() => {
-    dispatch(fetchThreads({ page: 0, size: 10 }));
+    dispatch(fetchThreads({ page: 0, size: 100 })); // Fetch more threads for client-side filtering
     dispatch(fetchCourses({ page: 0, size: 100 }));
     dispatch(fetchSemesters());
+    dispatch(fetchUsers({ page: 0, size: 100 }));
   }, [dispatch]);
-  
+
+  // Apply filters when threads or filter values change
+  useEffect(() => {
+    if (threads.length > 0) {
+      let filtered = [...threads];
+
+      // Filter by course ID
+      if (filters.courseId) {
+        filtered = filtered.filter(thread => thread.course_id === parseInt(filters.courseId));
+      }
+
+      // Filter by semester ID
+      if (filters.semesterId) {
+        filtered = filtered.filter(thread => thread.semester_id === parseInt(filters.semesterId));
+      }
+
+      setFilteredThreads(filtered);
+    } else {
+      setFilteredThreads([]);
+    }
+  }, [threads, filters]);
+
   const handlePageChange = (page) => {
-    dispatch(fetchThreads({ page, size: pageSize }));
+    // Since we're doing client-side filtering, we don't need to fetch new data
+    // Just update the current page in local state
+    if (page >= 0 && page < calculatedTotalPages) {
+      // We're not using the Redux state for pagination anymore
+      // Instead, we're tracking it locally
+      setCurrentPage(page);
+    }
   };
-  
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const handleSearch = (e) => {
     e.preventDefault();
-    // In a real implementation, we would filter threads by courseId and semesterId
-    dispatch(fetchThreads({ page: 0, size: pageSize }));
+    // Filters are already applied in the useEffect
   };
-  
+
+  const handleOpenEditModal = (thread) => {
+    setSelectedThread(thread);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedThread(null);
+  };
+
+  const handleUpdateThread = (id, threadData) => {
+    console.log('Updating thread:', id, threadData);
+
+    dispatch(updateThread({ id, threadData }))
+      .unwrap()
+      .then(() => {
+        // Close the modal
+        handleCloseEditModal();
+
+        // Show success message (you could add a toast notification here)
+        console.log('Thread updated successfully');
+      })
+      .catch((error) => {
+        console.error('Failed to update thread:', error);
+        // Show error message (you could add a toast notification here)
+      });
+  };
+
+  // Calculate pagination for filtered threads
+  const paginatedThreads = filteredThreads.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  const calculatedTotalPages = Math.ceil(filteredThreads.length / pageSize);
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -47,7 +120,7 @@ const Threads = () => {
           <FiPlus className="mr-2" /> Create Thread
         </button>
       </div>
-      
+
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
         <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
@@ -67,15 +140,22 @@ const Threads = () => {
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
               >
                 <option value="">All Courses</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
+                {/* Get unique courses from threads */}
+                {Array.from(new Set(threads.map(thread => thread.course_id)))
+                  .map(courseId => {
+                    const course = threads.find(t => t.course_id === courseId)?.course;
+                    return course ? (
+                      <option key={course.id} value={course.id}>
+                        {course.title}
+                      </option>
+                    ) : null;
+                  })
+                  .filter(Boolean)
+                }
               </select>
             </div>
           </div>
-          
+
           <div className="flex-1 min-w-[200px]">
             <label htmlFor="semesterId" className="block text-sm font-medium text-gray-700 mb-1">
               Semester
@@ -100,7 +180,7 @@ const Threads = () => {
               </select>
             </div>
           </div>
-          
+
           <div className="flex items-end">
             <button
               type="submit"
@@ -111,7 +191,7 @@ const Threads = () => {
           </div>
         </form>
       </div>
-      
+
       {/* Threads List */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {loading ? (
@@ -143,22 +223,50 @@ const Threads = () => {
           <div className="text-center py-12">No threads found</div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {threads.map((thread) => {
-              const course = courses.find((c) => c.id === thread.courseId);
-              const semester = semesters.find((s) => s.id === thread.semesterId);
-              
+            {paginatedThreads.map((thread) => {
+              // The course is now nested in the thread object
+              const course = thread.course;
+              const semester = semesters.find((s) => s.id === thread.semester_id);
+
               return (
                 <div key={thread.id} className="p-6 hover:bg-gray-50">
                   <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {course ? course.title : `Course #${thread.courseId}`}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <FiCalendar className="mr-1" />
-                        <span>{semester ? semester.name : `Semester #${thread.semesterId}`}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          {/* Thread Title */}
+                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            {thread.title}
+                          </h3>
+
+                          {/* Course Info */}
+                          <div className="flex items-center text-sm text-gray-600 mb-2">
+                            <FiBook className="mr-1" />
+                            <span>{course ? course.title : 'Unknown Course'}</span>
+                          </div>
+
+                          {/* Semester Info */}
+                          <div className="flex items-center text-sm text-gray-600 mb-2">
+                            <FiCalendar className="mr-1" />
+                            <span>{semester ? semester.name : `Semester #${thread.semester_id}`}</span>
+                          </div>
+
+                          {/* Created At */}
+                          <div className="flex items-center text-xs text-gray-500 mb-4">
+                            <span>Created: {formatTimestamp(thread.created_at)}</span>
+                          </div>
+                        </div>
+
+                        {/* Edit Button */}
+                        <button
+                          className="text-gray-500 hover:text-primary-600 p-2"
+                          onClick={() => handleOpenEditModal(thread)}
+                          title="Edit Thread"
+                        >
+                          <FiEdit size={18} />
+                        </button>
                       </div>
-                      
+
                       {/* Teacher */}
                       <div className="mt-4">
                         <h4 className="text-sm font-medium text-gray-700 mb-2">Teacher:</h4>
@@ -170,60 +278,38 @@ const Threads = () => {
                             <div className="text-sm font-medium text-gray-900">
                               {thread.teacher.name} {thread.teacher.surname}
                             </div>
+                            <div className="text-xs text-gray-500">{thread.teacher.email}</div>
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Students */}
+
+                      {/* Max Students */}
                       <div className="mt-4">
                         <div className="flex items-center mb-2">
-                          <h4 className="text-sm font-medium text-gray-700">Students:</h4>
+                          <h4 className="text-sm font-medium text-gray-700">Max Students:</h4>
                           <span className="ml-2 text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
-                            {thread.students.length}
+                            {thread.max_students || 'Unlimited'}
                           </span>
                         </div>
-                        <div className="flex -space-x-2">
-                          {thread.students.slice(0, 5).map((student) => (
-                            <div
-                              key={student.id}
-                              className="h-8 w-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center border-2 border-white"
-                              title={`${student.name} ${student.surname}`}
-                            >
-                              {student.name.charAt(0)}
-                            </div>
-                          ))}
-                          {thread.students.length > 5 && (
-                            <div className="h-8 w-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center border-2 border-white">
-                              +{thread.students.length - 5}
-                            </div>
-                          )}
-                        </div>
                       </div>
-                      
-                      {/* Schedule */}
-                      {thread.schedule && thread.schedule.length > 0 && (
+
+                      {/* Syllabus URL */}
+                      {thread.syllabus_url && (
                         <div className="mt-4">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Schedule:</h4>
-                          <div className="space-y-2">
-                            {thread.schedule.map((scheduleItem) => (
-                              <div key={scheduleItem.id} className="flex items-center text-sm">
-                                <div className="flex items-center mr-4">
-                                  <FiClock className="mr-1 text-gray-500" />
-                                  <span className="text-gray-600">
-                                    {scheduleItem.dayOfWeek}, {scheduleItem.startTime} - {scheduleItem.endTime}
-                                  </span>
-                                </div>
-                                <div className="flex items-center">
-                                  <FiMapPin className="mr-1 text-gray-500" />
-                                  <span className="text-gray-600">{scheduleItem.location}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Syllabus:</h4>
+                          <a
+                            href={thread.syllabus_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary-600 hover:text-primary-700 text-sm flex items-center"
+                          >
+                            <FiBook className="mr-1" />
+                            View Syllabus
+                          </a>
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex space-x-2">
                       <button className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200">
                         Manage
@@ -239,9 +325,9 @@ const Threads = () => {
           </div>
         )}
       </div>
-      
+
       {/* Pagination */}
-      {totalPages > 1 && (
+      {calculatedTotalPages > 1 && (
         <div className="mt-6 flex items-center justify-center">
           <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button
@@ -268,8 +354,8 @@ const Threads = () => {
                 />
               </svg>
             </button>
-            
-            {[...Array(totalPages).keys()].map((page) => (
+
+            {[...Array(calculatedTotalPages).keys()].map((page) => (
               <button
                 key={page}
                 onClick={() => handlePageChange(page)}
@@ -282,12 +368,12 @@ const Threads = () => {
                 {page + 1}
               </button>
             ))}
-            
+
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages - 1}
+              disabled={currentPage === calculatedTotalPages - 1}
               className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                currentPage === totalPages - 1
+                currentPage === calculatedTotalPages - 1
                   ? 'text-gray-300 cursor-not-allowed'
                   : 'text-gray-500 hover:bg-gray-50'
               }`}
@@ -310,6 +396,17 @@ const Threads = () => {
           </nav>
         </div>
       )}
+
+      {/* Edit Thread Modal */}
+      <EditThreadModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSubmit={handleUpdateThread}
+        thread={selectedThread}
+        courses={courses}
+        semesters={semesters}
+        teachers={teachers}
+      />
     </div>
   );
 };

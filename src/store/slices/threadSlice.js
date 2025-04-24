@@ -26,6 +26,21 @@ export const fetchThreadById = createAsyncThunk(
   }
 );
 
+export const updateThread = createAsyncThunk(
+  'threads/updateThread',
+  async ({ id, threadData }, { rejectWithValue }) => {
+    try {
+      console.log('Updating thread in thunk:', { id, threadData });
+      const response = await threadService.updateThread(id, threadData);
+      console.log('Update thread response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in updateThread thunk:', error);
+      return rejectWithValue(error.message || 'Failed to update thread');
+    }
+  }
+);
+
 export const fetchThreadsByCourse = createAsyncThunk(
   'threads/fetchThreadsByCourse',
   async (courseId, { rejectWithValue }) => {
@@ -154,7 +169,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Fetch thread by ID
       .addCase(fetchThreadById.pending, (state) => {
         state.loading = true;
@@ -168,7 +183,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Fetch threads by course
       .addCase(fetchThreadsByCourse.pending, (state) => {
         state.loading = true;
@@ -183,7 +198,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Create thread
       .addCase(createThread.pending, (state) => {
         state.loading = true;
@@ -193,7 +208,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.threads.push(action.payload);
         state.totalElements += 1;
-        
+
         // Update threadsByCourse if it exists
         const courseId = action.payload.courseId;
         if (state.threadsByCourse[courseId]) {
@@ -204,7 +219,45 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
+      // Update thread
+      .addCase(updateThread.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateThread.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedThread = action.payload;
+
+        // Update in threads array
+        const threadIndex = state.threads.findIndex(thread => thread.id === updatedThread.id);
+        if (threadIndex !== -1) {
+          state.threads[threadIndex] = updatedThread;
+        }
+
+        // Update in selectedThread
+        if (state.selectedThread && state.selectedThread.id === updatedThread.id) {
+          state.selectedThread = updatedThread;
+        }
+
+        // Update in threadsByCourse
+        if (updatedThread.course_id) {
+          const courseId = updatedThread.course_id;
+          if (state.threadsByCourse[courseId]) {
+            const courseThreadIndex = state.threadsByCourse[courseId].findIndex(
+              thread => thread.id === updatedThread.id
+            );
+            if (courseThreadIndex !== -1) {
+              state.threadsByCourse[courseId][courseThreadIndex] = updatedThread;
+            }
+          }
+        }
+      })
+      .addCase(updateThread.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // Delete thread
       .addCase(deleteThread.pending, (state) => {
         state.loading = true;
@@ -213,14 +266,14 @@ const threadSlice = createSlice({
       .addCase(deleteThread.fulfilled, (state, action) => {
         state.loading = false;
         const deletedThread = state.threads.find(thread => thread.id === action.payload);
-        
+
         state.threads = state.threads.filter(thread => thread.id !== action.payload);
         state.totalElements -= 1;
-        
+
         if (state.selectedThread && state.selectedThread.id === action.payload) {
           state.selectedThread = null;
         }
-        
+
         // Update threadsByCourse if it exists
         if (deletedThread) {
           const courseId = deletedThread.courseId;
@@ -235,7 +288,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Add student to thread
       .addCase(addStudentToThread.pending, (state) => {
         state.loading = true;
@@ -244,18 +297,18 @@ const threadSlice = createSlice({
       .addCase(addStudentToThread.fulfilled, (state, action) => {
         state.loading = false;
         const updatedThread = action.payload;
-        
+
         // Update in threads array
         const threadIndex = state.threads.findIndex(thread => thread.id === updatedThread.id);
         if (threadIndex !== -1) {
           state.threads[threadIndex] = updatedThread;
         }
-        
+
         // Update in selectedThread
         if (state.selectedThread && state.selectedThread.id === updatedThread.id) {
           state.selectedThread = updatedThread;
         }
-        
+
         // Update in threadsByCourse
         const courseId = updatedThread.courseId;
         if (state.threadsByCourse[courseId]) {
@@ -271,7 +324,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Remove student from thread
       .addCase(removeStudentFromThread.pending, (state) => {
         state.loading = true;
@@ -280,18 +333,18 @@ const threadSlice = createSlice({
       .addCase(removeStudentFromThread.fulfilled, (state, action) => {
         state.loading = false;
         const updatedThread = action.payload;
-        
+
         // Update in threads array
         const threadIndex = state.threads.findIndex(thread => thread.id === updatedThread.id);
         if (threadIndex !== -1) {
           state.threads[threadIndex] = updatedThread;
         }
-        
+
         // Update in selectedThread
         if (state.selectedThread && state.selectedThread.id === updatedThread.id) {
           state.selectedThread = updatedThread;
         }
-        
+
         // Update in threadsByCourse
         const courseId = updatedThread.courseId;
         if (state.threadsByCourse[courseId]) {
@@ -307,7 +360,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Add schedule to thread
       .addCase(addScheduleToThread.pending, (state) => {
         state.loading = true;
@@ -316,18 +369,18 @@ const threadSlice = createSlice({
       .addCase(addScheduleToThread.fulfilled, (state, action) => {
         state.loading = false;
         const { threadId, schedule } = action.payload;
-        
+
         // Update in threads array
         const threadIndex = state.threads.findIndex(thread => thread.id === threadId);
         if (threadIndex !== -1) {
           state.threads[threadIndex].schedule.push(schedule);
         }
-        
+
         // Update in selectedThread
         if (state.selectedThread && state.selectedThread.id === threadId) {
           state.selectedThread.schedule.push(schedule);
         }
-        
+
         // Update in threadsByCourse
         for (const courseId in state.threadsByCourse) {
           const courseThreadIndex = state.threadsByCourse[courseId].findIndex(
@@ -343,7 +396,7 @@ const threadSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Remove schedule from thread
       .addCase(removeScheduleFromThread.pending, (state) => {
         state.loading = true;
@@ -352,18 +405,18 @@ const threadSlice = createSlice({
       .addCase(removeScheduleFromThread.fulfilled, (state, action) => {
         state.loading = false;
         const updatedThread = action.payload;
-        
+
         // Update in threads array
         const threadIndex = state.threads.findIndex(thread => thread.id === updatedThread.id);
         if (threadIndex !== -1) {
           state.threads[threadIndex] = updatedThread;
         }
-        
+
         // Update in selectedThread
         if (state.selectedThread && state.selectedThread.id === updatedThread.id) {
           state.selectedThread = updatedThread;
         }
-        
+
         // Update in threadsByCourse
         const courseId = updatedThread.courseId;
         if (state.threadsByCourse[courseId]) {
