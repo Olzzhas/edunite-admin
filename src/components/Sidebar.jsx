@@ -12,7 +12,9 @@ import {
   FiUser,
   FiLayers,
   FiHardDrive,
-  FiClipboard
+  FiClipboard,
+  FiDatabase,
+  FiAlertCircle
 } from 'react-icons/fi';
 
 const Sidebar = ({ collapsed, toggleSidebar }) => {
@@ -40,6 +42,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
       title: 'System',
       items: [
         { name: 'Storage', icon: <FiHardDrive size={18} />, path: '/storage' },
+        { name: 'Logs', icon: <FiDatabase size={18} />, path: '/logs' },
         { name: 'Settings', icon: <FiSettings size={18} />, path: '/settings' },
       ]
     }

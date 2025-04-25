@@ -16,6 +16,7 @@ import Semesters from './pages/Semesters';
 import Threads from './pages/Threads';
 import Assignments from './pages/Assignments';
 import Storage from './pages/Storage';
+import Logs from './pages/Logs';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="threads" element={<Threads />} />
               <Route path="assignments" element={<Assignments />} />
               <Route path="storage" element={<Storage />} />
+              <Route path="logs" element={<Logs />} />
 
               {/* Catch-all route */}
               <Route path="*" element={<div className="p-6">Page not found</div>} />

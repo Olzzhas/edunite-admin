@@ -7,6 +7,7 @@ import threadReducer from './slices/threadSlice';
 import assignmentReducer from './slices/assignmentSlice';
 import storageReducer from './slices/storageSlice';
 import attendanceReducer from './slices/attendanceSlice';
+import logReducer from './slices/logSlice';
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     assignments: assignmentReducer,
     storage: storageReducer,
     attendance: attendanceReducer,
+    logs: logReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
