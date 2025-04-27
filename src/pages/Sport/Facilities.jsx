@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchFacilities, createFacility, updateFacility, deleteFacility } from '../../store/slices/facilitySlice';
 import { FiSearch, FiEdit, FiTrash2, FiPlus, FiMapPin, FiUsers } from 'react-icons/fi';
+import { useAlertDialog } from '../../contexts/AlertDialogContext';
 
 const Facilities = () => {
   const dispatch = useDispatch();
@@ -73,7 +74,7 @@ const Facilities = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (currentFacility) {
       dispatch(updateFacility({ id: currentFacility.id, facilityData: formData }))
         .unwrap()
@@ -98,24 +99,30 @@ const Facilities = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this facility?')) {
-      dispatch(deleteFacility(id))
-        .unwrap()
-        .then(() => {
-          dispatch(fetchFacilities({ page: currentPageState, size: pageSize }));
-        })
-        .catch((error) => {
-          console.error('Failed to delete facility:', error);
-        });
-    }
+  const { deleteConfirm } = useAlertDialog();
+
+  const handleDelete = (id, facilityName) => {
+    deleteConfirm({
+      title: 'Delete Facility',
+      message: `Are you sure you want to delete "${facilityName}"? This action cannot be undone.`,
+      onConfirm: () => {
+        dispatch(deleteFacility(id))
+          .unwrap()
+          .then(() => {
+            dispatch(fetchFacilities({ page: currentPageState, size: pageSize }));
+          })
+          .catch((error) => {
+            console.error('Failed to delete facility:', error);
+          });
+      }
+    });
   };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Facilities</h1>
-        <button 
+        <button
           className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center"
           onClick={() => openModal()}
         >
@@ -247,7 +254,7 @@ const Facilities = () => {
                         <FiEdit size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(facility.id)}
+                        onClick={() => handleDelete(facility.id, facility.name)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <FiTrash2 size={18} />

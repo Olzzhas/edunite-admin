@@ -7,6 +7,7 @@ import Analytics from './pages/Analytics';
 import Login from './pages/auth/Login';
 import UnauthorizedPage from './pages/auth/Unauthorized';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AlertDialogProvider } from './contexts/AlertDialogContext';
 import './App.css';
 
 // Import pages for the admin panel
@@ -28,15 +29,16 @@ import Schedules from './pages/Sport/Schedules';
 function App() {
   return (
     <Provider store={store}>
-      <Router>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <AlertDialogProvider>
+        <Router>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-          {/* Protected routes */}
-          <Route path="/" element={<ProtectedRoute requiredRole="admin" />}>
-            <Route element={<DashboardLayout />}>
+            {/* Protected routes */}
+            <Route path="/" element={<ProtectedRoute requiredRole="admin" />}>
+              <Route element={<DashboardLayout />}>
               <Route index element={<Navigate to="/dashboard" />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="analytics" element={<Analytics />} />
@@ -63,6 +65,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      </AlertDialogProvider>
     </Provider>
   );
 }

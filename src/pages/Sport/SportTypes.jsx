@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSportTypes, createSportType, updateSportType, deleteSportType } from '../../store/slices/sportTypeSlice';
 import { FiSearch, FiEdit, FiTrash2, FiPlus, FiUsers, FiActivity } from 'react-icons/fi';
+import { useAlertDialog } from '../../contexts/AlertDialogContext';
 
 const SportTypes = () => {
   const dispatch = useDispatch();
@@ -95,17 +96,23 @@ const SportTypes = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this sport type?')) {
-      dispatch(deleteSportType(id))
-        .unwrap()
-        .then(() => {
-          dispatch(fetchSportTypes({ page: currentPageState, size: pageSize }));
-        })
-        .catch((error) => {
-          console.error('Failed to delete sport type:', error);
-        });
-    }
+  const { deleteConfirm } = useAlertDialog();
+
+  const handleDelete = (id, sportName) => {
+    deleteConfirm({
+      title: 'Delete Sport Type',
+      message: `Are you sure you want to delete "${sportName}"? This action cannot be undone.`,
+      onConfirm: () => {
+        dispatch(deleteSportType(id))
+          .unwrap()
+          .then(() => {
+            dispatch(fetchSportTypes({ page: currentPageState, size: pageSize }));
+          })
+          .catch((error) => {
+            console.error('Failed to delete sport type:', error);
+          });
+      }
+    });
   };
 
   return (
@@ -238,7 +245,7 @@ const SportTypes = () => {
                         <FiEdit size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(sportType.id)}
+                        onClick={() => handleDelete(sportType.id, sportType.name)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <FiTrash2 size={18} />
