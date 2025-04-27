@@ -11,7 +11,7 @@ import EditThreadModal from '../components/modals/EditThreadModal';
 const Threads = () => {
   const dispatch = useDispatch();
   const { threads, loading, error } = useSelector((state) => state.threads);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10; // Local page size
   const { courses } = useSelector((state) => state.courses);
   const { semesters } = useSelector((state) => state.semesters);
@@ -33,10 +33,10 @@ const Threads = () => {
   const [filteredThreads, setFilteredThreads] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchThreads({ page: 0, size: 100 })); // Fetch more threads for client-side filtering
-    dispatch(fetchCourses({ page: 0, size: 100 }));
+    dispatch(fetchThreads({ page: 1, size: 100 })); // Fetch more threads for client-side filtering
+    dispatch(fetchCourses({ page: 1, size: 100 }));
     dispatch(fetchSemesters());
-    dispatch(fetchUsers({ page: 0, size: 100 }));
+    dispatch(fetchUsers({ page: 1, size: 100 }));
   }, [dispatch]);
 
   // Apply filters when threads or filter values change
@@ -63,7 +63,7 @@ const Threads = () => {
   const handlePageChange = (page) => {
     // Since we're doing client-side filtering, we don't need to fetch new data
     // Just update the current page in local state
-    if (page >= 0 && page < calculatedTotalPages) {
+    if (page >= 1 && page <= calculatedTotalPages) {
       // We're not using the Redux state for pagination anymore
       // Instead, we're tracking it locally
       setCurrentPage(page);
@@ -108,8 +108,8 @@ const Threads = () => {
       });
   };
 
-  // Calculate pagination for filtered threads
-  const paginatedThreads = filteredThreads.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  // Calculate pagination for filtered threads (adjust for 1-based indexing)
+  const paginatedThreads = filteredThreads.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const calculatedTotalPages = Math.ceil(filteredThreads.length / pageSize);
 
   return (
@@ -332,9 +332,9 @@ const Threads = () => {
           <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 0}
+              disabled={currentPage === 1}
               className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                currentPage === 0
+                currentPage === 1
                   ? 'text-gray-300 cursor-not-allowed'
                   : 'text-gray-500 hover:bg-gray-50'
               }`}
@@ -358,9 +358,9 @@ const Threads = () => {
             {[...Array(calculatedTotalPages).keys()].map((page) => (
               <button
                 key={page}
-                onClick={() => handlePageChange(page)}
+                onClick={() => handlePageChange(page + 1)}
                 className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                  currentPage === page
+                  currentPage === page + 1
                     ? 'z-10 bg-primary-50 border-primary-500 text-primary-600'
                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                 }`}
@@ -371,9 +371,9 @@ const Threads = () => {
 
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === calculatedTotalPages - 1}
+              disabled={currentPage === calculatedTotalPages}
               className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                currentPage === calculatedTotalPages - 1
+                currentPage === calculatedTotalPages
                   ? 'text-gray-300 cursor-not-allowed'
                   : 'text-gray-500 hover:bg-gray-50'
               }`}

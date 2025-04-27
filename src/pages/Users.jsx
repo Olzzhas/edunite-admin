@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { fetchUsers } from '../store/slices/userSlice';
-import { FiUser, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiUser, FiSearch, FiFilter, FiEdit, FiEye } from 'react-icons/fi';
 
 // Helper function to format dates safely
 const formatDate = (dateString) => {
@@ -36,6 +37,7 @@ const formatDate = (dateString) => {
 
 const Users = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { users, totalElements, totalPages, pageSize, loading, error } = useSelector(
     (state) => state.users
   );
@@ -84,15 +86,10 @@ const Users = () => {
     e.preventDefault();
     console.log('Search button clicked, applying filters:', filters);
 
-    // Show which filters will be applied server-side vs client-side
-    if (filters.name || filters.email) {
-      console.log('Name/Email search will be sent to server as "search" parameter');
-    }
+    // All filters are now applied server-side
+    console.log('All filters will be applied server-side');
 
-    if (filters.role) {
-      console.log('Role filter will be applied client-side after data is fetched');
-    }
-
+    setCurrentPageState(1); // Reset to first page when applying filters
     dispatch(fetchUsers({ page: 1, size: pageSize, filters }));
   };
 
@@ -100,7 +97,10 @@ const Users = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Users</h1>
-        <button className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">
+        <button
+          onClick={() => navigate('/users/new')}
+          className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700"
+        >
           Add User
         </button>
       </div>
@@ -224,9 +224,9 @@ const Users = () => {
               {loading ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-4 text-center">
-                    <div className="flex justify-center">
+                    <div className="flex flex-col items-center">
                       <svg
-                        className="animate-spin h-5 w-5 text-primary-500"
+                        className="animate-spin h-5 w-5 text-primary-500 mb-2"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -245,6 +245,7 @@ const Users = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
+                      <p className="text-sm text-gray-600">Loading users...</p>
                     </div>
                   </td>
                 </tr>
@@ -287,6 +288,7 @@ const Users = () => {
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-green-100 text-green-800'
                         }`}
+                        title={`Role value: "${user.role}"`}
                       >
                         {user.role}
                       </span>
@@ -295,11 +297,17 @@ const Users = () => {
                       {formatDate(user.created_at || user.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-primary-600 hover:text-primary-900 mr-3">
-                        Edit
+                      <button
+                        onClick={() => navigate(`/users/${user.id}`)}
+                        className="text-primary-600 hover:text-primary-900 mr-3 inline-flex items-center"
+                      >
+                        <FiEye className="mr-1" /> View
                       </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        Delete
+                      <button
+                        onClick={() => navigate(`/users/${user.id}`)}
+                        className="text-blue-600 hover:text-blue-900 mr-3 inline-flex items-center"
+                      >
+                        <FiEdit className="mr-1" /> Edit
                       </button>
                     </td>
                   </tr>

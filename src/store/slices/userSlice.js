@@ -7,21 +7,14 @@ export const fetchUsers = createAsyncThunk(
   async ({ page = 1, size = 10, filters = {} }, { rejectWithValue }) => {
     try {
       console.log('fetchUsers thunk called with filters:', filters);
+
+      // Use server-side filtering for all filters including role
       const response = await userService.getUsers(page, size, filters);
 
       // Handle the specific API response format
       if (response && response.users) {
         console.log('Received API response:', response);
-
         let filteredUsers = [...response.users];
-
-        // Apply client-side role filtering if needed
-        if (filters.role && filters.role !== '') {
-          console.log('Applying client-side role filtering for:', filters.role);
-          filteredUsers = filteredUsers.filter(user =>
-            user.role && user.role.toLowerCase() === filters.role.toLowerCase()
-          );
-        }
 
         // Transform the API response to match our expected format with client-side filtered users
         console.log('Original API pagination data:', {
@@ -32,16 +25,8 @@ export const fetchUsers = createAsyncThunk(
           total_records: response.total_records
         });
 
-        // If we're doing client-side filtering, we need to adjust the pagination
-        if (filters.role && filters.role !== '') {
-          return {
-            content: filteredUsers,
-            totalElements: filteredUsers.length, // Update count based on filtered results
-            totalPages: Math.ceil(filteredUsers.length / size),
-            size: response.page_size,
-            number: response.current_page,
-          };
-        } else {
+        // Use the server's pagination data for all filters
+        {
           // If no client-side filtering, use the server's pagination data
           // Make sure we have valid pagination data
           const totalRecords = response.total_records || 0;

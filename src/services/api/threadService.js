@@ -55,10 +55,10 @@ const MOCK_THREADS = [
 const MOCK_API = false;
 
 const threadService = {
-  getThreads: async (page = 0, size = 10) => {
+  getThreads: async (page = 1, size = 10) => {
     if (MOCK_API) {
-      // Paginate
-      const start = page * size;
+      // Paginate (adjust for 1-based indexing)
+      const start = (page - 1) * size;
       const end = start + size;
       const paginatedThreads = MOCK_THREADS.slice(start, end);
 

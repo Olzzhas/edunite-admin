@@ -4,7 +4,7 @@ import { threadService } from '../../services/api';
 // Async thunks
 export const fetchThreads = createAsyncThunk(
   'threads/fetchThreads',
-  async ({ page = 0, size = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, size = 10 }, { rejectWithValue }) => {
     try {
       const response = await threadService.getThreads(page, size);
       return response;

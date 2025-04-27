@@ -63,17 +63,18 @@ const userService = {
         );
       }
 
-      // Paginate
-      const start = page * size;
+      // Paginate (adjust for 1-based page index)
+      const start = (page - 1) * size;
       const end = start + size;
       const paginatedUsers = filteredUsers.slice(start, end);
 
       return {
-        content: paginatedUsers,
-        totalElements: filteredUsers.length,
-        totalPages: Math.ceil(filteredUsers.length / size),
-        size,
-        number: page,
+        users: paginatedUsers,
+        current_page: page,
+        page_size: size,
+        first_page: 1,
+        last_page: Math.ceil(filteredUsers.length / size),
+        total_records: filteredUsers.length
       };
     } else {
       try {
@@ -89,6 +90,13 @@ const userService = {
         // Combine email and name filters into a single search parameter if either exists
         if ((filters.email && filters.email !== '') || (filters.name && filters.name !== '')) {
           params.search = filters.email || filters.name;
+        }
+
+        // Pass role filter to API if it exists
+        if (filters.role && filters.role !== '') {
+          // Try to pass role as a separate parameter
+          params.role = filters.role;
+          console.log(`Adding role filter to API request: ${filters.role}`);
         }
 
         console.log('API request params:', params);
@@ -188,17 +196,18 @@ const userService = {
             );
           }
 
-          // Paginate
-          const start = page * size;
+          // Paginate (adjust for 1-based page index)
+          const start = (page - 1) * size;
           const end = start + size;
           const paginatedUsers = filteredUsers.slice(start, end);
 
           return {
-            content: paginatedUsers,
-            totalElements: filteredUsers.length,
-            totalPages: Math.ceil(filteredUsers.length / size),
-            size,
-            number: page,
+            users: paginatedUsers,
+            current_page: page,
+            page_size: size,
+            first_page: 1,
+            last_page: Math.ceil(filteredUsers.length / size),
+            total_records: filteredUsers.length
           };
         }
 
@@ -214,7 +223,12 @@ const userService = {
       if (!user) throw new Error('User not found');
       return user;
     } else {
-      const response = await apiClient.get(`/user/${id}`);
+      const response = await apiClient.get(`/user/users/${id}`);
+      // Handle the API response format where user is nested inside a "user" property
+      if (response.data && response.data.user) {
+        console.log('Received user data:', response.data.user);
+        return response.data.user;
+      }
       return response.data;
     }
   },
@@ -239,7 +253,12 @@ const userService = {
 
       return newUser;
     } else {
-      const response = await apiClient.post('/user', userData);
+      const response = await apiClient.post('/user/users', userData);
+      // Handle the API response format where user is nested inside a "user" property
+      if (response.data && response.data.user) {
+        console.log('Created user data:', response.data.user);
+        return response.data.user;
+      }
       return response.data;
     }
   },
@@ -262,7 +281,12 @@ const userService = {
 
       return updatedUser;
     } else {
-      const response = await apiClient.put(`/user/${id}`, userData);
+      const response = await apiClient.put(`/user/users/${id}`, userData);
+      // Handle the API response format where user is nested inside a "user" property
+      if (response.data && response.data.user) {
+        console.log('Updated user data:', response.data.user);
+        return response.data.user;
+      }
       return response.data;
     }
   },
@@ -277,7 +301,7 @@ const userService = {
 
       return { success: true };
     } else {
-      const response = await apiClient.delete(`/user/${id}`);
+      const response = await apiClient.delete(`/user/users/${id}`);
       return response.data;
     }
   },

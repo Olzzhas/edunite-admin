@@ -13,6 +13,8 @@ import './App.css';
 
 // Import pages for the admin panel
 import Users from './pages/Users';
+import UserDetails from './pages/UserDetails';
+import NewUser from './pages/NewUser';
 import Courses from './pages/Courses';
 import Semesters from './pages/Semesters';
 import Threads from './pages/Threads';
@@ -56,6 +58,8 @@ function App() {
 
               {/* Admin panel routes */}
               <Route path="users" element={<Users />} />
+              <Route path="users/new" element={<NewUser />} />
+              <Route path="users/:id" element={<UserDetails />} />
               <Route path="courses" element={<Courses />} />
               <Route path="semesters" element={<Semesters />} />
               <Route path="threads" element={<Threads />} />
