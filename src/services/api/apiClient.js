@@ -11,6 +11,14 @@ const apiClient = axios.create({
   },
 });
 
+// Global error handler for navigation
+let errorHandler = null;
+
+// Set the error handler
+export const setErrorHandler = (handler) => {
+  errorHandler = handler;
+};
+
 // Request interceptor for adding auth token
 apiClient.interceptors.request.use(
   (config) => {
@@ -79,6 +87,11 @@ apiClient.interceptors.response.use(
     // Handle 404 errors for API endpoints
     if (error.response.status === 404) {
       console.error('API endpoint not found:', originalRequest.url);
+    }
+
+    // Use the global error handler if available
+    if (errorHandler) {
+      errorHandler(error);
     }
 
     return Promise.reject(error);

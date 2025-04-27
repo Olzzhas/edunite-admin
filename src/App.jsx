@@ -8,6 +8,7 @@ import Login from './pages/auth/Login';
 import UnauthorizedPage from './pages/auth/Unauthorized';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AlertDialogProvider } from './contexts/AlertDialogContext';
+import ErrorHandler from './components/ErrorHandler';
 import './App.css';
 
 // Import pages for the admin panel
@@ -26,11 +27,21 @@ import Facilities from './pages/Sport/Facilities';
 import PhysicalEducation from './pages/Sport/PhysicalEducation';
 import Schedules from './pages/Sport/Schedules';
 
+// Import error pages
+import {
+  NotFound,
+  ServerError,
+  BadGateway,
+  Forbidden,
+  ServiceUnavailable
+} from './pages/errors';
+
 function App() {
   return (
     <Provider store={store}>
       <AlertDialogProvider>
         <Router>
+          <ErrorHandler />
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
@@ -60,8 +71,17 @@ function App() {
               <Route path="sport/schedules" element={<Schedules />} />
 
               {/* Catch-all route */}
-              <Route path="*" element={<div className="p-6">Page not found</div>} />
+              <Route path="*" element={<NotFound />} />
             </Route>
+          </Route>
+
+          {/* Error pages */}
+          <Route path="/error">
+            <Route path="404" element={<NotFound />} />
+            <Route path="403" element={<Forbidden />} />
+            <Route path="500" element={<ServerError />} />
+            <Route path="502" element={<BadGateway />} />
+            <Route path="503" element={<ServiceUnavailable />} />
           </Route>
         </Routes>
       </Router>

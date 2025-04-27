@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="70" y="120" width="80" height="100" rx="8" stroke="#0EA5E9" stroke-width="4"/>
+  <rect x="250" y="120" width="80" height="100" rx="8" stroke="#0EA5E9" stroke-width="4"/>
+  <path d="M150 170H250" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+  <path d="M150 150L170 170L150 190" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M250 150L230 170L250 190" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="90" y="140" width="40" height="10" rx="2" fill="#BAE6FD"/>
+  <rect x="90" y="160" width="40" height="10" rx="2" fill="#BAE6FD"/>
+  <rect x="90" y="180" width="40" height="10" rx="2" fill="#BAE6FD"/>
+  <rect x="270" y="140" width="40" height="10" rx="2" fill="#BAE6FD"/>
+  <rect x="270" y="160" width="40" height="10" rx="2" fill="#BAE6FD"/>
+  <rect x="270" y="180" width="40" height="10" rx="2" fill="#BAE6FD"/>
+  <circle cx="110" cy="90" r="20" fill="#BAE6FD"/>
+  <circle cx="290" cy="90" r="20" fill="#BAE6FD"/>
+  <path d="M110 90V120" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M290 90V120" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M200 50L200 90" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="200" cy="50" r="10" fill="#BAE6FD"/>
+  <path d="M200 90L110 90" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M200 90L290 90" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="200" cy="90" r="10" fill="#BAE6FD"/>
+  <path d="M200 90V220" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="200" cy="220" r="10" fill="#BAE6FD"/>
+  <path d="M200 220H110" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M200 220H290" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+</svg>

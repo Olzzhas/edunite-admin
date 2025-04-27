@@ -65,7 +65,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
       <div className="flex justify-between items-center p-5">
         {!collapsed && (
           <div className="flex items-center">
-            <span className="font-bold text-lg">Edunite</span>
+            <span className="font-bold text-lg">EDUNITE</span>
           </div>
         )}
         <button

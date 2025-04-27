@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M193.5 76.5C193.5 76.5 147 91 138 131.5C129 172 159.5 208 159.5 208" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M216.5 76.5C216.5 76.5 263 91 272 131.5C281 172 250.5 208 250.5 208" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M204 76.5V208" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M138 131.5H272" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="204" cy="76.5" r="20" fill="#BAE6FD"/>
+  <circle cx="138" cy="131.5" r="20" fill="#BAE6FD"/>
+  <circle cx="272" cy="131.5" r="20" fill="#BAE6FD"/>
+  <circle cx="159.5" cy="208" r="20" fill="#BAE6FD"/>
+  <circle cx="250.5" cy="208" r="20" fill="#BAE6FD"/>
+  <path d="M76 208L124 131.5H76V76.5H152V131.5L104 208H76Z" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M324 208L276 131.5H324V76.5H248V131.5L296 208H324Z" stroke="#0EA5E9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

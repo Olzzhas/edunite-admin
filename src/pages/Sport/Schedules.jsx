@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  fetchSchedules, 
-  createWeeklySchedule, 
-  createSportPatterns 
+import {
+  fetchSchedules,
+  createWeeklySchedule,
+  createSportPatterns
 } from '../../store/slices/physicalEducationSlice';
 import { fetchSportTypes } from '../../store/slices/sportTypeSlice';
 import { fetchFacilities } from '../../store/slices/facilitySlice';
@@ -61,7 +61,7 @@ const Schedules = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === 'weekDays') {
       // Handle multiple select for weekdays
       const options = e.target.options;
@@ -86,7 +86,7 @@ const Schedules = () => {
   const handlePatternInputChange = (e, index, field) => {
     const newPatterns = [...patternFormData.patterns];
     newPatterns[index][field] = e.target.value;
-    
+
     setPatternFormData({
       ...patternFormData,
       patterns: newPatterns,
@@ -128,7 +128,7 @@ const Schedules = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (modalType === 'weekly') {
       dispatch(createWeeklySchedule(formData))
         .unwrap()
@@ -161,10 +161,10 @@ const Schedules = () => {
 
   // Mock data for schedules
   const mockSchedules = [
-    { 
-      id: 1, 
-      sportType: 'Basketball', 
-      facility: 'Main Gym', 
+    {
+      id: 1,
+      sportType: 'Basketball',
+      facility: 'Main Gym',
       teacher: 'John Doe',
       weekDay: 'MONDAY',
       startTime: '14:00',
@@ -172,10 +172,10 @@ const Schedules = () => {
       startDate: '2024-01-01',
       endDate: '2024-05-31',
     },
-    { 
-      id: 2, 
-      sportType: 'Swimming', 
-      facility: 'Swimming Pool', 
+    {
+      id: 2,
+      sportType: 'Swimming',
+      facility: 'Swimming Pool',
       teacher: 'Jane Smith',
       weekDay: 'WEDNESDAY',
       startTime: '16:00',
@@ -183,10 +183,10 @@ const Schedules = () => {
       startDate: '2024-01-01',
       endDate: '2024-05-31',
     },
-    { 
-      id: 3, 
-      sportType: 'Tennis', 
-      facility: 'Tennis Court', 
+    {
+      id: 3,
+      sportType: 'Tennis',
+      facility: 'Tennis Court',
       teacher: 'Robert Johnson',
       weekDay: 'FRIDAY',
       startTime: '10:00',
@@ -194,20 +194,73 @@ const Schedules = () => {
       startDate: '2024-01-01',
       endDate: '2024-05-31',
     },
+    {
+      id: 4,
+      sportType: 'Basketball',
+      facility: 'Main Gym',
+      teacher: 'John Doe',
+      weekDay: 'WEDNESDAY',
+      startTime: '16:00',
+      endTime: '17:30',
+      startDate: '2024-01-01',
+      endDate: '2024-05-31',
+    },
+    {
+      id: 5,
+      sportType: 'Swimming',
+      facility: 'Swimming Pool',
+      teacher: 'Jane Smith',
+      weekDay: 'FRIDAY',
+      startTime: '14:00',
+      endTime: '15:30',
+      startDate: '2024-01-01',
+      endDate: '2024-05-31',
+    },
+    {
+      id: 6,
+      sportType: 'Tennis',
+      facility: 'Tennis Court',
+      teacher: 'Robert Johnson',
+      weekDay: 'MONDAY',
+      startTime: '14:00',
+      endTime: '15:30',
+      startDate: '2024-01-01',
+      endDate: '2024-05-31',
+    },
+    {
+      id: 7,
+      sportType: 'Volleyball',
+      facility: 'Main Gym',
+      teacher: 'John Doe',
+      weekDay: 'THURSDAY',
+      startTime: '14:00',
+      endTime: '15:30',
+      startDate: '2024-01-01',
+      endDate: '2024-05-31',
+    },
   ];
+
+  // Group schedules by sport type
+  const groupedSchedules = mockSchedules.reduce((acc, schedule) => {
+    if (!acc[schedule.sportType]) {
+      acc[schedule.sportType] = [];
+    }
+    acc[schedule.sportType].push(schedule);
+    return acc;
+  }, {});
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Schedules</h1>
         <div className="flex space-x-2">
-          <button 
+          <button
             className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center"
             onClick={() => openModal('weekly')}
           >
             <FiPlus className="mr-2" /> Create Weekly Schedule
           </button>
-          <button 
+          <button
             className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center"
             onClick={() => openModal('pattern')}
           >
@@ -217,113 +270,106 @@ const Schedules = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card title="Current Schedules">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sport Type
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Facility
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Teacher
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Day
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Time
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Period
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {loading ? (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center">
-                      <div className="flex justify-center">
-                        <svg
-                          className="animate-spin h-5 w-5 text-primary-500"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                      </div>
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-red-500">
-                      {error}
-                    </td>
-                  </tr>
-                ) : mockSchedules.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center">
-                      No schedules found
-                    </td>
-                  </tr>
-                ) : (
-                  mockSchedules.map((schedule) => (
-                    <tr key={schedule.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-8 w-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
-                            <FiActivity size={16} />
-                          </div>
-                          <div className="ml-3 text-sm font-medium text-gray-900">{schedule.sportType}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-8 w-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-                            <FiMapPin size={16} />
-                          </div>
-                          <div className="ml-3 text-sm text-gray-900">{schedule.facility}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-8 w-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
-                            <FiUsers size={16} />
-                          </div>
-                          <div className="ml-3 text-sm text-gray-900">{schedule.teacher}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{schedule.weekDay}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{schedule.startTime} - {schedule.endTime}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{schedule.startDate} to {schedule.endDate}</div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+        <Card title="Schedules by Sport Type">
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <svg
+                className="animate-spin h-8 w-8 text-primary-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8 text-red-500">{error}</div>
+          ) : Object.keys(groupedSchedules).length === 0 ? (
+            <div className="text-center py-8">No schedules found</div>
+          ) : (
+            <div className="space-y-8">
+              {Object.entries(groupedSchedules).map(([sportType, schedules]) => (
+                <div key={sportType} className="mb-6">
+                  <div className="flex items-center mb-4">
+                    <div className="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3">
+                      <FiActivity size={20} />
+                    </div>
+                    <h3 className="text-xl font-semibold text-primary">{sportType}</h3>
+                    <span className="ml-2 text-sm text-secondary bg-secondary px-2 py-1 rounded-full">
+                      {schedules.length} {schedules.length === 1 ? 'schedule' : 'schedules'}
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto bg-card rounded-lg shadow-sm">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-secondary">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-tertiary uppercase tracking-wider">
+                            Facility
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-tertiary uppercase tracking-wider">
+                            Teacher
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-tertiary uppercase tracking-wider">
+                            Day
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-tertiary uppercase tracking-wider">
+                            Time
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-tertiary uppercase tracking-wider">
+                            Period
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {schedules.map((schedule) => (
+                          <tr key={schedule.id} className="hover:bg-secondary">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-8 w-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                                  <FiMapPin size={16} />
+                                </div>
+                                <div className="ml-3 text-sm text-primary">{schedule.facility}</div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-8 w-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
+                                  <FiUsers size={16} />
+                                </div>
+                                <div className="ml-3 text-sm text-primary">{schedule.teacher}</div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-primary">{schedule.weekDay}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-primary">{schedule.startTime} - {schedule.endTime}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-primary">{schedule.startDate} to {schedule.endDate}</div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -331,25 +377,25 @@ const Schedules = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            <div className="fixed inset-0 transition-opacity backdrop-blur-sm" aria-hidden="true">
+              <div className="absolute inset-0 bg-black bg-opacity-50 dark:bg-opacity-70"></div>
             </div>
 
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div className="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full bg-card">
               <form onSubmit={handleSubmit}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4 bg-card">
                   <div className="sm:flex sm:items-start">
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      <h3 className="text-lg leading-6 font-medium text-primary">
                         {modalType === 'weekly' ? 'Create Weekly Schedule' : 'Create Sport Pattern'}
                       </h3>
-                      
+
                       {modalType === 'weekly' ? (
                         <div className="mt-4 space-y-4">
                           <div>
-                            <label htmlFor="facilityId" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="facilityId" className="block text-sm font-medium text-secondary">
                               Facility
                             </label>
                             <select
@@ -369,7 +415,7 @@ const Schedules = () => {
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="teacherId" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="teacherId" className="block text-sm font-medium text-secondary">
                               Teacher
                             </label>
                             <select
@@ -389,7 +435,7 @@ const Schedules = () => {
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="sportTypeId" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="sportTypeId" className="block text-sm font-medium text-secondary">
                               Sport Type
                             </label>
                             <select
@@ -409,7 +455,7 @@ const Schedules = () => {
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="weekDays" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="weekDays" className="block text-sm font-medium text-secondary">
                               Week Days
                             </label>
                             <select
@@ -515,7 +561,7 @@ const Schedules = () => {
                               ))}
                             </select>
                           </div>
-                          
+
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
@@ -546,10 +592,10 @@ const Schedules = () => {
                               />
                             </div>
                           </div>
-                          
+
                           <div className="border-t border-gray-200 pt-4">
                             <h4 className="text-md font-medium text-gray-900 mb-2">Patterns</h4>
-                            
+
                             {patternFormData.patterns.map((pattern, index) => (
                               <div key={index} className="mb-6 p-4 border border-gray-200 rounded-md">
                                 <div className="flex justify-between items-center mb-2">
@@ -564,7 +610,7 @@ const Schedules = () => {
                                     </button>
                                   )}
                                 </div>
-                                
+
                                 <div className="space-y-3">
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700">
@@ -584,7 +630,7 @@ const Schedules = () => {
                                       ))}
                                     </select>
                                   </div>
-                                  
+
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700">
                                       Teacher
@@ -603,7 +649,7 @@ const Schedules = () => {
                                       ))}
                                     </select>
                                   </div>
-                                  
+
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700">
                                       Week Day
@@ -624,7 +670,7 @@ const Schedules = () => {
                                       <option value="SUNDAY">Sunday</option>
                                     </select>
                                   </div>
-                                  
+
                                   <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-sm font-medium text-gray-700">
@@ -654,7 +700,7 @@ const Schedules = () => {
                                 </div>
                               </div>
                             ))}
-                            
+
                             <button
                               type="button"
                               onClick={addPattern}
@@ -668,7 +714,7 @@ const Schedules = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <div className="bg-secondary px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                   <button
                     type="submit"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm"
@@ -678,7 +724,7 @@ const Schedules = () => {
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 text-base font-medium hover:bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm bg-card text-primary border-light"
                   >
                     Cancel
                   </button>
