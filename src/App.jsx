@@ -18,6 +18,13 @@ import Assignments from './pages/Assignments';
 import Storage from './pages/Storage';
 import Logs from './pages/Logs';
 
+// Import pages for the sport service
+import Sport from './pages/Sport';
+import SportTypes from './pages/Sport/SportTypes';
+import Facilities from './pages/Sport/Facilities';
+import PhysicalEducation from './pages/Sport/PhysicalEducation';
+import Schedules from './pages/Sport/Schedules';
+
 function App() {
   return (
     <Provider store={store}>
@@ -42,6 +49,13 @@ function App() {
               <Route path="assignments" element={<Assignments />} />
               <Route path="storage" element={<Storage />} />
               <Route path="logs" element={<Logs />} />
+
+              {/* Sport service routes */}
+              <Route path="sport" element={<Sport />} />
+              <Route path="sport/types" element={<SportTypes />} />
+              <Route path="sport/facilities" element={<Facilities />} />
+              <Route path="sport/physical-education" element={<PhysicalEducation />} />
+              <Route path="sport/schedules" element={<Schedules />} />
 
               {/* Catch-all route */}
               <Route path="*" element={<div className="p-6">Page not found</div>} />

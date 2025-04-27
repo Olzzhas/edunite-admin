@@ -103,10 +103,11 @@ const Semesters = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Semesters</h1>
         <button
-          className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center"
+          className="bg-primary-600 px-4 py-2 rounded-md hover:bg-primary-700 flex items-center"
           onClick={handleOpenAddSemesterModal}
         >
-          <FiPlus className="mr-2" /> Add Semester
+          <FiPlus className="mr-2" style={{ color: 'black' }} />
+          <span style={{ color: 'black' }}>Add Semester</span>
         </button>
       </div>
 
@@ -196,7 +197,8 @@ const Semesters = () => {
                   className="mt-4 text-sm text-primary-600 hover:text-primary-700 flex items-center"
                   onClick={() => handleOpenAddBreakModal(semester)}
                 >
-                  <FiPlus className="mr-1" /> Add Break
+                  <FiPlus className="mr-1" style={{ color: 'black' }} />
+                  <span style={{ color: 'black' }}>Add Break</span>
                 </button>
               </div>
             ))}

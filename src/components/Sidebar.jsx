@@ -14,7 +14,9 @@ import {
   FiHardDrive,
   FiClipboard,
   FiDatabase,
-  FiAlertCircle
+  FiAlertCircle,
+  FiActivity,
+  FiMapPin
 } from 'react-icons/fi';
 
 const Sidebar = ({ collapsed, toggleSidebar }) => {
@@ -36,6 +38,16 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
         { name: 'Semesters', icon: <FiCalendar size={18} />, path: '/semesters' },
         { name: 'Threads', icon: <FiLayers size={18} />, path: '/threads' },
         { name: 'Assignments', icon: <FiClipboard size={18} />, path: '/assignments' },
+      ]
+    },
+    {
+      title: 'Sport Service',
+      items: [
+        { name: 'Sport Overview', icon: <FiActivity size={18} />, path: '/sport' },
+        { name: 'Sport Types', icon: <FiActivity size={18} />, path: '/sport/types' },
+        { name: 'Facilities', icon: <FiMapPin size={18} />, path: '/sport/facilities' },
+        { name: 'Physical Education', icon: <FiUsers size={18} />, path: '/sport/physical-education' },
+        { name: 'Schedules', icon: <FiCalendar size={18} />, path: '/sport/schedules' },
       ]
     },
     {
@@ -73,8 +85,15 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
             <nav>
               <ul className="space-y-1">
                 {category.items.map((item, itemIndex) => {
+                  // For the sport overview, only mark as active if it's an exact match
+                  const isSportOverview = item.path === '/sport';
+
+                  // For other items, use the standard logic
                   const isActive = location.pathname === item.path ||
-                                  (item.path !== '/' && location.pathname.startsWith(item.path));
+                                  (item.path !== '/' &&
+                                   location.pathname.startsWith(item.path) &&
+                                   // Don't mark sport overview as active when on a sport sub-page
+                                   !(isSportOverview && location.pathname !== '/sport'));
 
                   return (
                     <li key={itemIndex}>

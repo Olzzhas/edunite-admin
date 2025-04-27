@@ -8,6 +8,9 @@ import assignmentReducer from './slices/assignmentSlice';
 import storageReducer from './slices/storageSlice';
 import attendanceReducer from './slices/attendanceSlice';
 import logReducer from './slices/logSlice';
+import sportTypeReducer from './slices/sportTypeSlice';
+import facilityReducer from './slices/facilitySlice';
+import physicalEducationReducer from './slices/physicalEducationSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,6 +23,9 @@ const store = configureStore({
     storage: storageReducer,
     attendance: attendanceReducer,
     logs: logReducer,
+    sportTypes: sportTypeReducer,
+    facilities: facilityReducer,
+    physicalEducation: physicalEducationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
