@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { login, clearError, setError } from '../../store/slices/authSlice';
 import { FiUser, FiLock, FiAlertCircle } from 'react-icons/fi';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
 
@@ -65,7 +67,7 @@ const Login = () => {
             Sign in to Edunite
           </h2>
           <p className="mt-2 text-center text-sm text-tertiary">
-            Admin Panel
+            Empowering Education Management
           </p>
         </div>
 
@@ -151,7 +153,11 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                theme === 'light'
+                  ? 'bg-gray-800 hover:bg-gray-900'
+                  : 'bg-primary-600 hover:bg-primary-700'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
                 loading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >

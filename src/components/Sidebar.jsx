@@ -48,6 +48,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
         { name: 'Facilities', icon: <FiMapPin size={18} />, path: '/sport/facilities' },
         { name: 'Physical Education', icon: <FiUsers size={18} />, path: '/sport/physical-education' },
         { name: 'Schedules', icon: <FiCalendar size={18} />, path: '/sport/schedules' },
+        { name: 'Filtered Schedules', icon: <FiCalendar size={18} />, path: '/sport/filtered-schedules' },
       ]
     },
     {

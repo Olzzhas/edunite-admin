@@ -35,6 +35,13 @@ const Sport = () => {
       path: '/sport/schedules',
       count: 8,
     },
+    {
+      title: 'Filtered Schedules',
+      description: 'Search and filter sports schedules',
+      icon: <FiCalendar size={24} className="text-pink-500" />,
+      path: '/sport/filtered-schedules',
+      count: 15,
+    },
   ];
 
   const tabs = [

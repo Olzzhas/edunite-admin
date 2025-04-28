@@ -7,6 +7,7 @@ import {
 } from '../../store/slices/physicalEducationSlice';
 import { fetchSportTypes } from '../../store/slices/sportTypeSlice';
 import { fetchFacilities } from '../../store/slices/facilitySlice';
+import { fetchSemesters } from '../../store/slices/semesterSlice';
 import { FiCalendar, FiPlus, FiActivity, FiMapPin, FiUsers } from 'react-icons/fi';
 import Card from '../../components/Card';
 
@@ -15,6 +16,7 @@ const Schedules = () => {
   const { schedules, loading, error } = useSelector((state) => state.physicalEducation);
   const { sportTypes } = useSelector((state) => state.sportTypes);
   const { facilities } = useSelector((state) => state.facilities);
+  const { semesters } = useSelector((state) => state.semesters);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('weekly'); // 'weekly' or 'pattern'
@@ -22,22 +24,30 @@ const Schedules = () => {
     facilityId: '',
     teacherId: '',
     sportTypeId: '',
-    weekDays: [],
+    semesterId: '',
+    dayOfWeek: '1', // 1 = Monday, 2 = Tuesday, etc.
     startTime: '',
     endTime: '',
+    location: '',
     startDate: '',
     endDate: '',
   });
 
   const [patternFormData, setPatternFormData] = useState({
     sportTypeId: '',
+    semesterId: '',
     patterns: [
       {
-        facilityId: '',
-        teacherId: '',
-        weekDay: '',
-        startTime: '',
-        endTime: '',
+        schedules: [
+          {
+            facilityId: '',
+            teacherId: '',
+            dayOfWeek: '1',
+            startTime: '',
+            endTime: '',
+            location: '',
+          }
+        ]
       }
     ],
     startDate: '',
@@ -48,6 +58,7 @@ const Schedules = () => {
     dispatch(fetchSchedules());
     dispatch(fetchSportTypes({ page: 1, size: 100 }));
     dispatch(fetchFacilities({ page: 1, size: 100 }));
+    dispatch(fetchSemesters());
   }, [dispatch]);
 
   const openModal = (type) => {
@@ -83,9 +94,9 @@ const Schedules = () => {
     }
   };
 
-  const handlePatternInputChange = (e, index, field) => {
+  const handlePatternInputChange = (e, patternIndex, scheduleIndex, field) => {
     const newPatterns = [...patternFormData.patterns];
-    newPatterns[index][field] = e.target.value;
+    newPatterns[patternIndex].schedules[scheduleIndex][field] = e.target.value;
 
     setPatternFormData({
       ...patternFormData,
@@ -101,17 +112,49 @@ const Schedules = () => {
     });
   };
 
+  const addScheduleToPattern = (patternIndex) => {
+    const newPatterns = [...patternFormData.patterns];
+    newPatterns[patternIndex].schedules.push({
+      facilityId: '',
+      teacherId: '',
+      dayOfWeek: '1',
+      startTime: '',
+      endTime: '',
+      location: '',
+    });
+
+    setPatternFormData({
+      ...patternFormData,
+      patterns: newPatterns,
+    });
+  };
+
+  const removeScheduleFromPattern = (patternIndex, scheduleIndex) => {
+    const newPatterns = [...patternFormData.patterns];
+    newPatterns[patternIndex].schedules.splice(scheduleIndex, 1);
+
+    setPatternFormData({
+      ...patternFormData,
+      patterns: newPatterns,
+    });
+  };
+
   const addPattern = () => {
     setPatternFormData({
       ...patternFormData,
       patterns: [
         ...patternFormData.patterns,
         {
-          facilityId: '',
-          teacherId: '',
-          weekDay: '',
-          startTime: '',
-          endTime: '',
+          schedules: [
+            {
+              facilityId: '',
+              teacherId: '',
+              dayOfWeek: '1',
+              startTime: '',
+              endTime: '',
+              location: '',
+            }
+          ]
         }
       ],
     });
@@ -130,7 +173,14 @@ const Schedules = () => {
     e.preventDefault();
 
     if (modalType === 'weekly') {
-      dispatch(createWeeklySchedule(formData))
+      // Format dates to ISO format
+      const formattedData = {
+        ...formData,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString()
+      };
+
+      dispatch(createWeeklySchedule(formattedData))
         .unwrap()
         .then(() => {
           closeModal();
@@ -140,7 +190,14 @@ const Schedules = () => {
           console.error('Failed to create weekly schedule:', error);
         });
     } else {
-      dispatch(createSportPatterns(patternFormData))
+      // Format dates to ISO format
+      const formattedData = {
+        ...patternFormData,
+        startDate: new Date(patternFormData.startDate).toISOString(),
+        endDate: new Date(patternFormData.endDate).toISOString()
+      };
+
+      dispatch(createSportPatterns(formattedData))
         .unwrap()
         .then(() => {
           closeModal();
@@ -409,7 +466,7 @@ const Schedules = () => {
                               <option value="">Select a facility</option>
                               {facilities.map((facility) => (
                                 <option key={facility.id} value={facility.id}>
-                                  {facility.name}
+                                  {facility.title || facility.name}
                                 </option>
                               ))}
                             </select>
@@ -449,34 +506,66 @@ const Schedules = () => {
                               <option value="">Select a sport type</option>
                               {sportTypes.map((sportType) => (
                                 <option key={sportType.id} value={sportType.id}>
-                                  {sportType.name}
+                                  {sportType.title || sportType.name}
                                 </option>
                               ))}
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="weekDays" className="block text-sm font-medium text-secondary">
-                              Week Days
+                            <label htmlFor="semesterId" className="block text-sm font-medium text-secondary">
+                              Semester
                             </label>
                             <select
-                              name="weekDays"
-                              id="weekDays"
-                              multiple
-                              value={formData.weekDays}
+                              name="semesterId"
+                              id="semesterId"
+                              value={formData.semesterId}
                               onChange={handleInputChange}
                               required
                               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                              size="5"
                             >
-                              <option value="MONDAY">Monday</option>
-                              <option value="TUESDAY">Tuesday</option>
-                              <option value="WEDNESDAY">Wednesday</option>
-                              <option value="THURSDAY">Thursday</option>
-                              <option value="FRIDAY">Friday</option>
-                              <option value="SATURDAY">Saturday</option>
-                              <option value="SUNDAY">Sunday</option>
+                              <option value="">Select a semester</option>
+                              {semesters.map((semester) => (
+                                <option key={semester.id} value={semester.id}>
+                                  {semester.name}
+                                </option>
+                              ))}
                             </select>
-                            <p className="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd to select multiple days</p>
+                          </div>
+                          <div>
+                            <label htmlFor="dayOfWeek" className="block text-sm font-medium text-secondary">
+                              Day of Week
+                            </label>
+                            <select
+                              name="dayOfWeek"
+                              id="dayOfWeek"
+                              value={formData.dayOfWeek}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                            >
+                              <option value="1">Monday</option>
+                              <option value="2">Tuesday</option>
+                              <option value="3">Wednesday</option>
+                              <option value="4">Thursday</option>
+                              <option value="5">Friday</option>
+                              <option value="6">Saturday</option>
+                              <option value="7">Sunday</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label htmlFor="location" className="block text-sm font-medium text-secondary">
+                              Location
+                            </label>
+                            <input
+                              type="text"
+                              name="location"
+                              id="location"
+                              value={formData.location}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                              placeholder="e.g., Main Gym"
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -556,7 +645,28 @@ const Schedules = () => {
                               <option value="">Select a sport type</option>
                               {sportTypes.map((sportType) => (
                                 <option key={sportType.id} value={sportType.id}>
-                                  {sportType.name}
+                                  {sportType.title || sportType.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label htmlFor="semesterId" className="block text-sm font-medium text-secondary">
+                              Semester
+                            </label>
+                            <select
+                              name="semesterId"
+                              id="semesterId"
+                              value={patternFormData.semesterId}
+                              onChange={handlePatternMainInputChange}
+                              required
+                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                            >
+                              <option value="">Select a semester</option>
+                              {semesters.map((semester) => (
+                                <option key={semester.id} value={semester.id}>
+                                  {semester.name}
                                 </option>
                               ))}
                             </select>
@@ -596,108 +706,146 @@ const Schedules = () => {
                           <div className="border-t border-gray-200 pt-4">
                             <h4 className="text-md font-medium text-gray-900 mb-2">Patterns</h4>
 
-                            {patternFormData.patterns.map((pattern, index) => (
-                              <div key={index} className="mb-6 p-4 border border-gray-200 rounded-md">
+                            {patternFormData.patterns.map((pattern, patternIndex) => (
+                              <div key={patternIndex} className="mb-6 p-4 border border-gray-200 rounded-md">
                                 <div className="flex justify-between items-center mb-2">
-                                  <h5 className="text-sm font-medium text-gray-700">Pattern {index + 1}</h5>
+                                  <h5 className="text-sm font-medium text-gray-700">Pattern {patternIndex + 1}</h5>
                                   {patternFormData.patterns.length > 1 && (
                                     <button
                                       type="button"
-                                      onClick={() => removePattern(index)}
+                                      onClick={() => removePattern(patternIndex)}
                                       className="text-red-600 hover:text-red-800 text-sm"
                                     >
-                                      Remove
+                                      Remove Pattern
                                     </button>
                                   )}
                                 </div>
 
-                                <div className="space-y-3">
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Facility
-                                    </label>
-                                    <select
-                                      value={pattern.facilityId}
-                                      onChange={(e) => handlePatternInputChange(e, index, 'facilityId')}
-                                      required
-                                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                    >
-                                      <option value="">Select a facility</option>
-                                      {facilities.map((facility) => (
-                                        <option key={facility.id} value={facility.id}>
-                                          {facility.name}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Teacher
-                                    </label>
-                                    <select
-                                      value={pattern.teacherId}
-                                      onChange={(e) => handlePatternInputChange(e, index, 'teacherId')}
-                                      required
-                                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                    >
-                                      <option value="">Select a teacher</option>
-                                      {mockTeachers.map((teacher) => (
-                                        <option key={teacher.id} value={teacher.id}>
-                                          {teacher.name}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Week Day
-                                    </label>
-                                    <select
-                                      value={pattern.weekDay}
-                                      onChange={(e) => handlePatternInputChange(e, index, 'weekDay')}
-                                      required
-                                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                    >
-                                      <option value="">Select a day</option>
-                                      <option value="MONDAY">Monday</option>
-                                      <option value="TUESDAY">Tuesday</option>
-                                      <option value="WEDNESDAY">Wednesday</option>
-                                      <option value="THURSDAY">Thursday</option>
-                                      <option value="FRIDAY">Friday</option>
-                                      <option value="SATURDAY">Saturday</option>
-                                      <option value="SUNDAY">Sunday</option>
-                                    </select>
-                                  </div>
-
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Start Time
-                                      </label>
-                                      <input
-                                        type="time"
-                                        value={pattern.startTime}
-                                        onChange={(e) => handlePatternInputChange(e, index, 'startTime')}
-                                        required
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                      />
+                                {pattern.schedules.map((schedule, scheduleIndex) => (
+                                  <div key={`${patternIndex}-${scheduleIndex}`} className="mb-4 p-3 border border-gray-100 rounded-md bg-gray-50">
+                                    <div className="flex justify-between items-center mb-2">
+                                      <h6 className="text-xs font-medium text-gray-700">Schedule {scheduleIndex + 1}</h6>
+                                      {pattern.schedules.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={() => removeScheduleFromPattern(patternIndex, scheduleIndex)}
+                                          className="text-red-600 hover:text-red-800 text-xs"
+                                        >
+                                          Remove
+                                        </button>
+                                      )}
                                     </div>
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        End Time
-                                      </label>
-                                      <input
-                                        type="time"
-                                        value={pattern.endTime}
-                                        onChange={(e) => handlePatternInputChange(e, index, 'endTime')}
-                                        required
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                      />
+
+                                    <div className="space-y-3">
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Facility
+                                        </label>
+                                        <select
+                                          value={schedule.facilityId}
+                                          onChange={(e) => handlePatternInputChange(e, patternIndex, scheduleIndex, 'facilityId')}
+                                          required
+                                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                        >
+                                          <option value="">Select a facility</option>
+                                          {facilities.map((facility) => (
+                                            <option key={facility.id} value={facility.id}>
+                                              {facility.title || facility.name}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </div>
+
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Teacher
+                                        </label>
+                                        <select
+                                          value={schedule.teacherId}
+                                          onChange={(e) => handlePatternInputChange(e, patternIndex, scheduleIndex, 'teacherId')}
+                                          required
+                                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                        >
+                                          <option value="">Select a teacher</option>
+                                          {mockTeachers.map((teacher) => (
+                                            <option key={teacher.id} value={teacher.id}>
+                                              {teacher.name}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </div>
+
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Day of Week
+                                        </label>
+                                        <select
+                                          value={schedule.dayOfWeek}
+                                          onChange={(e) => handlePatternInputChange(e, patternIndex, scheduleIndex, 'dayOfWeek')}
+                                          required
+                                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                        >
+                                          <option value="1">Monday</option>
+                                          <option value="2">Tuesday</option>
+                                          <option value="3">Wednesday</option>
+                                          <option value="4">Thursday</option>
+                                          <option value="5">Friday</option>
+                                          <option value="6">Saturday</option>
+                                          <option value="7">Sunday</option>
+                                        </select>
+                                      </div>
+
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Location
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={schedule.location}
+                                          onChange={(e) => handlePatternInputChange(e, patternIndex, scheduleIndex, 'location')}
+                                          required
+                                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                          placeholder="e.g., Main Gym"
+                                        />
+                                      </div>
+
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                          <label className="block text-sm font-medium text-gray-700">
+                                            Start Time
+                                          </label>
+                                          <input
+                                            type="time"
+                                            value={schedule.startTime}
+                                            onChange={(e) => handlePatternInputChange(e, patternIndex, scheduleIndex, 'startTime')}
+                                            required
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-sm font-medium text-gray-700">
+                                            End Time
+                                          </label>
+                                          <input
+                                            type="time"
+                                            value={schedule.endTime}
+                                            onChange={(e) => handlePatternInputChange(e, patternIndex, scheduleIndex, 'endTime')}
+                                            required
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                          />
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                ))}
+
+                                <button
+                                  type="button"
+                                  onClick={() => addScheduleToPattern(patternIndex)}
+                                  className="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                >
+                                  <FiPlus className="mr-1" /> Add Schedule
+                                </button>
                               </div>
                             ))}
 

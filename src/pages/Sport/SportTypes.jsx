@@ -41,9 +41,10 @@ const SportTypes = () => {
     if (sportType) {
       setCurrentSportType(sportType);
       setFormData({
-        name: sportType.name,
-        description: sportType.description,
-        maxParticipants: sportType.maxParticipants,
+        name: sportType.title || sportType.name || '',
+        description: sportType.description || '',
+        maxParticipants: sportType.maxParticipants || 0,
+        requiresCertificate: sportType.requires_certificate || false,
       });
     } else {
       setCurrentSportType(null);
@@ -51,6 +52,7 @@ const SportTypes = () => {
         name: '',
         description: '',
         maxParticipants: 0,
+        requiresCertificate: false,
       });
     }
     setIsModalOpen(true);
@@ -72,8 +74,22 @@ const SportTypes = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Transform form data to match API expectations
+    const apiFormData = {
+      title: formData.name,
+      description: formData.description,
+      requires_certificate: formData.requiresCertificate
+    };
+
+    // Only include maxParticipants if it's greater than 0
+    if (formData.maxParticipants > 0) {
+      apiFormData.max_participants = formData.maxParticipants;
+    }
+
+    console.log('Submitting sport type data:', apiFormData);
+
     if (currentSportType) {
-      dispatch(updateSportType({ id: currentSportType.id, sportTypeData: formData }))
+      dispatch(updateSportType({ id: currentSportType.id, sportTypeData: apiFormData }))
         .unwrap()
         .then(() => {
           closeModal();
@@ -83,7 +99,7 @@ const SportTypes = () => {
           console.error('Failed to update sport type:', error);
         });
     } else {
-      dispatch(createSportType(formData))
+      dispatch(createSportType(apiFormData))
         .unwrap()
         .then(() => {
           closeModal();
@@ -223,7 +239,7 @@ const SportTypes = () => {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {sportType.name}
+                            {sportType.title || sportType.name}
                           </div>
                         </div>
                       </div>
@@ -234,7 +250,10 @@ const SportTypes = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <FiUsers className="text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">{sportType.maxParticipants}</span>
+                        <span className="text-sm text-gray-900">
+                          {sportType.requires_certificate ? 'Certificate Required' :
+                           sportType.maxParticipants || 'Not specified'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -245,7 +264,7 @@ const SportTypes = () => {
                         <FiEdit size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(sportType.id, sportType.name)}
+                        onClick={() => handleDelete(sportType.id, sportType.title || sportType.name)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <FiTrash2 size={18} />
@@ -397,12 +416,27 @@ const SportTypes = () => {
                             type="number"
                             name="maxParticipants"
                             id="maxParticipants"
-                            min="1"
+                            min="0"
                             value={formData.maxParticipants}
                             onChange={handleInputChange}
-                            required
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                           />
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            name="requiresCertificate"
+                            id="requiresCertificate"
+                            checked={formData.requiresCertificate}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              requiresCertificate: e.target.checked
+                            })}
+                            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="requiresCertificate" className="ml-2 block text-sm font-medium text-gray-700">
+                            Requires Certificate
+                          </label>
                         </div>
                       </div>
                     </div>

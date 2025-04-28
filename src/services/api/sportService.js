@@ -150,7 +150,7 @@ const MOCK_SCHEDULES = [
 ];
 
 // Use mock API for development
-const MOCK_API = true;
+const MOCK_API = false;
 
 const sportService = {
   // Sport Types
@@ -170,8 +170,25 @@ const sportService = {
         }
       };
     } else {
-      const response = await sportApiClient.get('/sport-types', { params: { page, page_size: size } });
-      return response.data;
+      try {
+        console.log('Fetching sport types with params:', { page, page_size: size });
+        const response = await sportApiClient.get('/sport-types', { params: { page, page_size: size } });
+        console.log('Sport types API response:', response.data);
+
+        // Transform the API response to match our expected format
+        return {
+          data: response.data.sport_types || [],
+          meta: {
+            total: response.data.total || 0,
+            page: response.data.page || 1,
+            page_size: response.data.page_size || size,
+            total_pages: Math.ceil((response.data.total || 0) / (response.data.page_size || size))
+          }
+        };
+      } catch (error) {
+        console.error('Error fetching sport types:', error);
+        throw error;
+      }
     }
   },
 
@@ -181,8 +198,18 @@ const sportService = {
       if (!sportType) throw new Error('Sport type not found');
       return sportType;
     } else {
-      const response = await sportApiClient.get(`/sport-types/${id}`);
-      return response.data;
+      try {
+        console.log(`Fetching sport type with ID: ${id}`);
+        const response = await sportApiClient.get(`/sport-types/${id}`);
+        console.log('Sport type API response:', response.data);
+
+        // The API might return the sport type directly or nested in a sport_type field
+        const sportType = response.data.sport_type || response.data;
+        return sportType;
+      } catch (error) {
+        console.error(`Error fetching sport type with ID ${id}:`, error);
+        throw error;
+      }
     }
   },
 
@@ -204,8 +231,18 @@ const sportService = {
 
       return newSportType;
     } else {
-      const response = await sportApiClient.post('/sport-types', sportTypeData);
-      return response.data;
+      try {
+        console.log('Creating sport type with data:', sportTypeData);
+        const response = await sportApiClient.post('/sport-types', sportTypeData);
+        console.log('Create sport type API response:', response.data);
+
+        // The API might return the created sport type directly or nested in a sport_type field
+        const createdSportType = response.data.sport_type || response.data;
+        return createdSportType;
+      } catch (error) {
+        console.error('Error creating sport type:', error);
+        throw error;
+      }
     }
   },
 
@@ -226,8 +263,18 @@ const sportService = {
 
       return updatedSportType;
     } else {
-      const response = await sportApiClient.put(`/sport-types/${id}`, sportTypeData);
-      return response.data;
+      try {
+        console.log(`Updating sport type with ID ${id} with data:`, sportTypeData);
+        const response = await sportApiClient.put(`/sport-types/${id}`, sportTypeData);
+        console.log('Update sport type API response:', response.data);
+
+        // The API might return the updated sport type directly or nested in a sport_type field
+        const updatedSportType = response.data.sport_type || response.data;
+        return updatedSportType;
+      } catch (error) {
+        console.error(`Error updating sport type with ID ${id}:`, error);
+        throw error;
+      }
     }
   },
 
@@ -241,8 +288,17 @@ const sportService = {
 
       return { success: true };
     } else {
-      const response = await sportApiClient.delete(`/sport-types/${id}`);
-      return response.data;
+      try {
+        console.log(`Deleting sport type with ID: ${id}`);
+        const response = await sportApiClient.delete(`/sport-types/${id}`);
+        console.log('Delete sport type API response:', response.data);
+
+        // Return the ID for consistency with the reducer
+        return id;
+      } catch (error) {
+        console.error(`Error deleting sport type with ID ${id}:`, error);
+        throw error;
+      }
     }
   },
 
@@ -263,8 +319,25 @@ const sportService = {
         }
       };
     } else {
-      const response = await sportApiClient.get('/facilities', { params: { page, page_size: size } });
-      return response.data;
+      try {
+        console.log('Fetching facilities with params:', { page, page_size: size });
+        const response = await sportApiClient.get('/facilities', { params: { page, page_size: size } });
+        console.log('Facilities API response:', response.data);
+
+        // Transform the API response to match our expected format
+        return {
+          data: response.data.facilities || [],
+          meta: {
+            total: response.data.total || 0,
+            page: response.data.page || 1,
+            page_size: response.data.page_size || size,
+            total_pages: Math.ceil((response.data.total || 0) / (response.data.page_size || size))
+          }
+        };
+      } catch (error) {
+        console.error('Error fetching facilities:', error);
+        throw error;
+      }
     }
   },
 
@@ -274,8 +347,18 @@ const sportService = {
       if (!facility) throw new Error('Facility not found');
       return facility;
     } else {
-      const response = await sportApiClient.get(`/facilities/${id}`);
-      return response.data;
+      try {
+        console.log(`Fetching facility with ID: ${id}`);
+        const response = await sportApiClient.get(`/facilities/${id}`);
+        console.log('Facility API response:', response.data);
+
+        // The API might return the facility directly or nested in a facility field
+        const facility = response.data.facility || response.data;
+        return facility;
+      } catch (error) {
+        console.error(`Error fetching facility with ID ${id}:`, error);
+        throw error;
+      }
     }
   },
 
@@ -297,8 +380,26 @@ const sportService = {
 
       return newFacility;
     } else {
-      const response = await sportApiClient.post('/facilities', facilityData);
-      return response.data;
+      try {
+        // Transform data to match API expectations
+        const apiData = {
+          title: facilityData.name || facilityData.title,
+          location: facilityData.location,
+          max_capacity: facilityData.capacity || facilityData.max_capacity,
+          description: facilityData.description
+        };
+
+        console.log('Creating facility with data:', apiData);
+        const response = await sportApiClient.post('/facilities', apiData);
+        console.log('Create facility API response:', response.data);
+
+        // The API might return the created facility directly or nested in a facility field
+        const createdFacility = response.data.facility || response.data;
+        return createdFacility;
+      } catch (error) {
+        console.error('Error creating facility:', error);
+        throw error;
+      }
     }
   },
 
@@ -319,8 +420,26 @@ const sportService = {
 
       return updatedFacility;
     } else {
-      const response = await sportApiClient.put(`/facilities/${id}`, facilityData);
-      return response.data;
+      try {
+        // Transform data to match API expectations
+        const apiData = {
+          title: facilityData.name || facilityData.title,
+          location: facilityData.location,
+          max_capacity: facilityData.capacity || facilityData.max_capacity,
+          description: facilityData.description
+        };
+
+        console.log(`Updating facility with ID ${id} with data:`, apiData);
+        const response = await sportApiClient.put(`/facilities/${id}`, apiData);
+        console.log('Update facility API response:', response.data);
+
+        // The API might return the updated facility directly or nested in a facility field
+        const updatedFacility = response.data.facility || response.data;
+        return updatedFacility;
+      } catch (error) {
+        console.error(`Error updating facility with ID ${id}:`, error);
+        throw error;
+      }
     }
   },
 
@@ -334,8 +453,17 @@ const sportService = {
 
       return { success: true };
     } else {
-      const response = await sportApiClient.delete(`/facilities/${id}`);
-      return response.data;
+      try {
+        console.log(`Deleting facility with ID: ${id}`);
+        const response = await sportApiClient.delete(`/facilities/${id}`);
+        console.log('Delete facility API response:', response.data);
+
+        // Return the ID for consistency with the reducer
+        return id;
+      } catch (error) {
+        console.error(`Error deleting facility with ID ${id}:`, error);
+        throw error;
+      }
     }
   },
 
@@ -406,6 +534,90 @@ const sportService = {
     }
   },
 
+  getFilteredSchedules: async (filters = {}) => {
+    const {
+      facility_id,
+      teacher_id,
+      semester_id,
+      start_date,
+      end_date,
+      page = 1,
+      page_size = 20
+    } = filters;
+
+    if (MOCK_API) {
+      // Filter mock schedules based on provided filters
+      let filteredSchedules = [...MOCK_SCHEDULES];
+
+      if (facility_id) {
+        filteredSchedules = filteredSchedules.filter(s => s.facilityId === parseInt(facility_id));
+      }
+
+      if (teacher_id) {
+        filteredSchedules = filteredSchedules.filter(s => s.teacherId === parseInt(teacher_id));
+      }
+
+      if (semester_id) {
+        // In a real app, schedules would be linked to semesters
+        // For mock data, we'll just pretend all schedules are in the given semester
+      }
+
+      if (start_date) {
+        const startDateObj = new Date(start_date);
+        filteredSchedules = filteredSchedules.filter(s => new Date(s.startDate) >= startDateObj);
+      }
+
+      if (end_date) {
+        const endDateObj = new Date(end_date);
+        filteredSchedules = filteredSchedules.filter(s => new Date(s.endDate) <= endDateObj);
+      }
+
+      // Paginate results
+      const startIndex = (page - 1) * page_size;
+      const endIndex = startIndex + page_size;
+      const paginatedSchedules = filteredSchedules.slice(startIndex, endIndex);
+
+      return {
+        data: paginatedSchedules,
+        meta: {
+          total: filteredSchedules.length,
+          page,
+          page_size,
+          total_pages: Math.ceil(filteredSchedules.length / page_size)
+        }
+      };
+    } else {
+      try {
+        // Build query parameters
+        const params = { page, page_size };
+
+        if (facility_id) params.facility_id = facility_id;
+        if (teacher_id) params.teacher_id = teacher_id;
+        if (semester_id) params.semester_id = semester_id;
+        if (start_date) params.start_date = start_date;
+        if (end_date) params.end_date = end_date;
+
+        console.log('Fetching schedules with params:', params);
+        const response = await sportApiClient.get('/schedules', { params });
+        console.log('API response:', response.data);
+
+        // Transform the API response to match our expected format
+        return {
+          data: response.data.schedules || [],
+          meta: {
+            total: response.data.total || 0,
+            page: response.data.page || 1,
+            page_size: response.data.page_size || 20,
+            total_pages: Math.ceil((response.data.total || 0) / (response.data.page_size || 20))
+          }
+        };
+      } catch (error) {
+        console.error('Error fetching schedules:', error);
+        throw error;
+      }
+    }
+  },
+
   createWeeklySchedule: async (scheduleData) => {
     if (MOCK_API) {
       // Generate a new ID
@@ -423,7 +635,23 @@ const sportService = {
 
       return newSchedule;
     } else {
-      const response = await sportApiClient.post('/schedules/weekly', scheduleData);
+      // Transform data to match API expectations
+      const apiData = {
+        facility_id: parseInt(scheduleData.facilityId),
+        teacher_id: parseInt(scheduleData.teacherId),
+        semester_id: parseInt(scheduleData.semesterId),
+        sport_type_id: parseInt(scheduleData.sportTypeId),
+        day_of_week: parseInt(scheduleData.dayOfWeek),
+        start_time: scheduleData.startTime,
+        end_time: scheduleData.endTime,
+        location: scheduleData.location,
+        start_date: scheduleData.startDate,
+        end_date: scheduleData.endDate
+      };
+
+      console.log('Creating weekly schedule with data:', apiData);
+      const response = await sportApiClient.post('/schedules/weekly', apiData);
+      console.log('Create weekly schedule API response:', response.data);
       return response.data;
     }
   },
@@ -449,7 +677,27 @@ const sportService = {
 
       return newSchedules;
     } else {
-      const response = await sportApiClient.post('/schedules/sport-patterns', patternsData);
+      // Transform data to match API expectations
+      const apiData = {
+        semester_id: parseInt(patternsData.semesterId),
+        start_date: patternsData.startDate,
+        end_date: patternsData.endDate,
+        patterns: patternsData.patterns.map(pattern => ({
+          sport_type_id: parseInt(patternsData.sportTypeId),
+          schedules: pattern.schedules.map(schedule => ({
+            facility_id: parseInt(schedule.facilityId),
+            teacher_id: parseInt(schedule.teacherId),
+            day_of_week: parseInt(schedule.dayOfWeek),
+            start_time: schedule.startTime,
+            end_time: schedule.endTime,
+            location: schedule.location
+          }))
+        }))
+      };
+
+      console.log('Creating sport patterns with data:', apiData);
+      const response = await sportApiClient.post('/schedules/sport-patterns', apiData);
+      console.log('Create sport patterns API response:', response.data);
       return response.data;
     }
   },

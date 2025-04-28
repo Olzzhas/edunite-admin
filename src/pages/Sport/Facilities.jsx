@@ -42,10 +42,10 @@ const Facilities = () => {
     if (facility) {
       setCurrentFacility(facility);
       setFormData({
-        name: facility.name,
-        location: facility.location,
-        capacity: facility.capacity,
-        description: facility.description,
+        name: facility.title || facility.name || '',
+        location: facility.location || '',
+        capacity: facility.max_capacity || facility.capacity || 0,
+        description: facility.description || '',
       });
     } else {
       setCurrentFacility(null);
@@ -75,8 +75,18 @@ const Facilities = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Transform form data to match API expectations
+    const apiFormData = {
+      title: formData.name,
+      location: formData.location,
+      max_capacity: formData.capacity,
+      description: formData.description
+    };
+
+    console.log('Submitting facility data:', apiFormData);
+
     if (currentFacility) {
-      dispatch(updateFacility({ id: currentFacility.id, facilityData: formData }))
+      dispatch(updateFacility({ id: currentFacility.id, facilityData: apiFormData }))
         .unwrap()
         .then(() => {
           closeModal();
@@ -86,7 +96,7 @@ const Facilities = () => {
           console.error('Failed to update facility:', error);
         });
     } else {
-      dispatch(createFacility(formData))
+      dispatch(createFacility(apiFormData))
         .unwrap()
         .then(() => {
           closeModal();
@@ -229,7 +239,7 @@ const Facilities = () => {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {facility.name}
+                            {facility.title || facility.name}
                           </div>
                         </div>
                       </div>
@@ -240,7 +250,7 @@ const Facilities = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <FiUsers className="text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">{facility.capacity}</span>
+                        <span className="text-sm text-gray-900">{facility.max_capacity || facility.capacity}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -254,7 +264,7 @@ const Facilities = () => {
                         <FiEdit size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(facility.id, facility.name)}
+                        onClick={() => handleDelete(facility.id, facility.title || facility.name)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <FiTrash2 size={18} />

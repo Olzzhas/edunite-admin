@@ -28,6 +28,7 @@ import SportTypes from './pages/Sport/SportTypes';
 import Facilities from './pages/Sport/Facilities';
 import PhysicalEducation from './pages/Sport/PhysicalEducation';
 import Schedules from './pages/Sport/Schedules';
+import FilteredSchedules from './pages/Sport/FilteredSchedules';
 
 // Import error pages
 import {
@@ -73,6 +74,7 @@ function App() {
               <Route path="sport/facilities" element={<Facilities />} />
               <Route path="sport/physical-education" element={<PhysicalEducation />} />
               <Route path="sport/schedules" element={<Schedules />} />
+              <Route path="sport/filtered-schedules" element={<FilteredSchedules />} />
 
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

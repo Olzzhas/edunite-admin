@@ -11,6 +11,7 @@ import logReducer from './slices/logSlice';
 import sportTypeReducer from './slices/sportTypeSlice';
 import facilityReducer from './slices/facilitySlice';
 import physicalEducationReducer from './slices/physicalEducationSlice';
+import scheduleReducer from './slices/scheduleSlice';
 
 const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ const store = configureStore({
     sportTypes: sportTypeReducer,
     facilities: facilityReducer,
     physicalEducation: physicalEducationReducer,
+    schedules: scheduleReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

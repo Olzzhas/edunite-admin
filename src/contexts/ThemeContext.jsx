@@ -12,11 +12,7 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       return savedTheme;
     }
-    // Check if user has a system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    // Default to light theme
+    // Always default to light theme, ignoring system preference
     return 'light';
   });
 
@@ -47,13 +43,14 @@ export const ThemeProvider = ({ children }) => {
     console.log('Theme changed to:', theme);
   }, [theme]);
 
-  // Listen for system theme changes
+  // We're not automatically changing theme based on system preference anymore
+  // But we'll keep the listener structure in case we want to re-enable this feature later
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
-      if (!localStorage.getItem('theme')) {
-        setTheme(mediaQuery.matches ? 'dark' : 'light');
-      }
+      // Only log the change but don't automatically switch theme
+      console.log('System preference changed:', mediaQuery.matches ? 'dark' : 'light');
+      // Theme will remain as user's explicit choice or default light
     };
 
     mediaQuery.addEventListener('change', handleChange);
