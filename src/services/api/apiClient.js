@@ -45,6 +45,15 @@ apiClient.interceptors.response.use(
       });
     }
 
+    // Handle JSON parsing errors
+    if (error.response && error.response.data && error.response.data.error === 'failed to parse JSON request') {
+      console.error('JSON parsing error:', error.response.data);
+      return Promise.reject({
+        message: 'Invalid JSON format. Please check your request data.',
+        response: error.response
+      });
+    }
+
     const originalRequest = error.config;
 
     // If error is 401 and we haven't tried to refresh the token yet

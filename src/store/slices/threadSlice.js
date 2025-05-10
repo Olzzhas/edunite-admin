@@ -65,6 +65,18 @@ export const createThread = createAsyncThunk(
   }
 );
 
+export const createThreadWithSchedule = createAsyncThunk(
+  'threads/createThreadWithSchedule',
+  async (threadData, { rejectWithValue }) => {
+    try {
+      const response = await threadService.createThreadWithSchedule(threadData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to create thread with schedule');
+    }
+  }
+);
+
 export const deleteThread = createAsyncThunk(
   'threads/deleteThread',
   async (id, { rejectWithValue }) => {
@@ -216,6 +228,27 @@ const threadSlice = createSlice({
         }
       })
       .addCase(createThread.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Create thread with schedule
+      .addCase(createThreadWithSchedule.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createThreadWithSchedule.fulfilled, (state, action) => {
+        state.loading = false;
+        state.threads.push(action.payload);
+        state.totalElements += 1;
+
+        // Update threadsByCourse if it exists
+        const courseId = action.payload.courseId || action.payload.course_id;
+        if (state.threadsByCourse[courseId]) {
+          state.threadsByCourse[courseId].push(action.payload);
+        }
+      })
+      .addCase(createThreadWithSchedule.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

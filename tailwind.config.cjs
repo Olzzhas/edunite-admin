@@ -7,6 +7,10 @@ module.exports = {
   darkMode: 'class', // Enable dark mode with class strategy
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"SF Pro Text"', '"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', '"San Francisco"', '"Helvetica Neue"', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['"SF Pro Display"', '"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"San Francisco"', '"Helvetica Neue"', 'system-ui', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: 'var(--primary-50)',

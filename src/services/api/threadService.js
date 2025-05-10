@@ -1,5 +1,9 @@
+import axios from 'axios';
 import apiClient from './apiClient';
 import { MOCK_USERS } from './mockData';
+
+// Get the API URL from the apiClient
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
 // Mock data for development
 const MOCK_THREADS = [
@@ -135,6 +139,112 @@ const threadService = {
     } else {
       const response = await apiClient.post('/thread', threadData);
       return response.data;
+    }
+  },
+
+  createThreadWithSchedule: async (threadData) => {
+    if (MOCK_API) {
+      // Generate a new ID
+      const newId = Math.max(...MOCK_THREADS.map(t => t.id)) + 1;
+
+      // Extract schedules from the data
+      const { schedules, ...threadDetails } = threadData;
+
+      // Create new thread
+      const newThread = {
+        id: newId,
+        students: [],
+        schedule: schedules.map((schedule, index) => ({
+          id: index + 1,
+          dayOfWeek: schedule.day_of_week === 1 ? 'MONDAY' :
+                    schedule.day_of_week === 2 ? 'TUESDAY' :
+                    schedule.day_of_week === 3 ? 'WEDNESDAY' :
+                    schedule.day_of_week === 4 ? 'THURSDAY' :
+                    schedule.day_of_week === 5 ? 'FRIDAY' :
+                    schedule.day_of_week === 6 ? 'SATURDAY' : 'SUNDAY',
+          startTime: schedule.start_time,
+          endTime: schedule.end_time,
+          location: schedule.location
+        })),
+        ...threadDetails,
+      };
+
+      // Add to mock data
+      MOCK_THREADS.push(newThread);
+
+      return newThread;
+    } else {
+      try {
+        // Create a clean object with exactly the structure needed
+        const cleanData = {
+          title: String(threadData.title || ''),
+          course_id: Number(threadData.course_id),
+          semester_id: Number(threadData.semester_id),
+          teacher_id: Number(threadData.teacher_id),
+          max_students: Number(threadData.max_students || 30),
+          schedules: (threadData.schedules || []).map(schedule => ({
+            day_of_week: Number(schedule.day_of_week),
+            start_time: String(schedule.start_time || ''),
+            end_time: String(schedule.end_time || ''),
+            location: String(schedule.location || '')
+          }))
+        };
+
+        // Log the exact data being sent
+        console.log('Sending thread data:', JSON.stringify(cleanData, null, 2));
+
+        // Create a hardcoded JSON string that matches exactly what the server expects
+        // This is a last resort approach to avoid any potential JSON formatting issues
+        const jsonString = `{
+  "title": "${cleanData.title.replace(/"/g, '\\"')}",
+  "course_id": ${cleanData.course_id},
+  "semester_id": ${cleanData.semester_id},
+  "teacher_id": ${cleanData.teacher_id},
+  "max_students": ${cleanData.max_students},
+  "schedules": [
+    ${cleanData.schedules.map(s => `{
+      "day_of_week": ${s.day_of_week},
+      "start_time": "${s.start_time}",
+      "end_time": "${s.end_time}",
+      "location": "${s.location.replace(/"/g, '\\"')}"
+    }`).join(',\n    ')}
+  ]
+}`;
+
+        console.log('Using hardcoded JSON string:', jsonString);
+
+        // Get the auth token
+        const token = localStorage.getItem('accessToken');
+        const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+        // Try fetch with the hardcoded JSON string
+        const fetchResponse = await fetch(`${API_URL}/thread/with-schedule`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...authHeader
+          },
+          body: jsonString
+        });
+
+        if (!fetchResponse.ok) {
+          const errorText = await fetchResponse.text();
+          throw new Error(`Request failed: ${fetchResponse.status} ${fetchResponse.statusText} - ${errorText}`);
+        }
+
+        const data = await fetchResponse.json();
+        console.log('Create thread response:', data);
+        return data;
+      } catch (error) {
+        console.error('Error creating thread with schedule:', error);
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+          console.error('Response headers:', error.response.headers);
+        }
+        throw error;
+      }
     }
   },
 

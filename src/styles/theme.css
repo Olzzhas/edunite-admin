@@ -162,6 +162,17 @@ button {
   transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
 }
 
+/* Fix for primary buttons to ensure they have proper contrast */
+.bg-primary-600.text-white {
+  background-color: #0284c7 !important; /* primary-600 */
+  color: white !important;
+}
+
+.hover\:bg-primary-700:hover,
+button.bg-primary-600:hover {
+  background-color: #0369a1 !important; /* primary-700 */
+}
+
 /* Header and sidebar */
 .header {
   background-color: var(--header-bg);
