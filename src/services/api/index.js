@@ -9,6 +9,8 @@ import assignmentService from './assignmentService';
 import storageService from './storageService';
 import attendanceService from './attendanceService';
 import sportService from './sportService';
+import registerService from './registerService';
+import locationService from './locationService';
 
 export {
   apiClient,
@@ -22,6 +24,8 @@ export {
   storageService,
   attendanceService,
   sportService,
+  registerService,
+  locationService,
 };
 
 // Export mock data for development

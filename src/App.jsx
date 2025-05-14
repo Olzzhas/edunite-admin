@@ -20,8 +20,10 @@ import Courses from "./pages/Courses";
 import Semesters from "./pages/Semesters";
 import Threads from "./pages/Threads";
 import Assignments from "./pages/Assignments";
+import Locations from "./pages/Locations";
 import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
+import HealthCheck from "./pages/HealthCheck";
 
 // Import pages for the sport service
 import Sport from "./pages/Sport";
@@ -61,6 +63,8 @@ function App() {
                            <Route path="semesters" element={<Semesters />} />
                            <Route path="threads" element={<Threads />} />
                            <Route path="assignments" element={<Assignments />} />
+                           <Route path="locations" element={<Locations />} />
+                           <Route path="health-check" element={<HealthCheck />} />
                            <Route path="storage" element={<Storage />} />
                            <Route path="logs" element={<Logs />} />
 

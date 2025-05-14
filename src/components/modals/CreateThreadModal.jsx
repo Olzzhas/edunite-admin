@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiX, FiPlus, FiTrash2, FiAlertCircle } from "react-icons/fi";
 
-const CreateThreadModal = ({ isOpen, onClose, onSubmit, courses, semesters, teachers }) => {
+const CreateThreadModal = ({ isOpen, onClose, onSubmit, courses, semesters, teachers, locations }) => {
    const [threadData, setThreadData] = useState({
       title: "",
       description: "",
@@ -14,7 +14,7 @@ const CreateThreadModal = ({ isOpen, onClose, onSubmit, courses, semesters, teac
             day_of_week: 1, // Monday
             start_time: "09:00:00",
             end_time: "10:30:00",
-            location: "Room 101",
+            location: "",
          },
       ],
    });
@@ -35,7 +35,7 @@ const CreateThreadModal = ({ isOpen, onClose, onSubmit, courses, semesters, teac
                day_of_week: 1, // Monday
                start_time: "09:00:00",
                end_time: "10:30:00",
-               location: "Room 101",
+               location: "",
             },
          ],
       });
@@ -80,7 +80,7 @@ const CreateThreadModal = ({ isOpen, onClose, onSubmit, courses, semesters, teac
                day_of_week: 1,
                start_time: "09:00:00",
                end_time: "10:30:00",
-               location: "Room 101",
+               location: "",
             },
          ],
       }));
@@ -403,15 +403,21 @@ const CreateThreadModal = ({ isOpen, onClose, onSubmit, courses, semesters, teac
 
                                  <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Location</label>
-                                    <input
-                                       type="text"
+                                    <select
                                        value={schedule.location}
                                        onChange={(e) => handleScheduleChange(index, "location", e.target.value)}
                                        className={`block w-full px-3 py-2 border ${
                                           errors[`schedules.${index}.location`] ? "border-red-300" : "border-gray-300"
                                        } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-xs`}
-                                       placeholder="Room number"
-                                    />
+                                    >
+                                       <option value="">Select a location</option>
+                                       {locations &&
+                                          locations.map((location) => (
+                                             <option key={location.id} value={location.name}>
+                                                {location.name} (Capacity: {location.capacity})
+                                             </option>
+                                          ))}
+                                    </select>
                                     {errors[`schedules.${index}.location`] && (
                                        <p className="mt-1 text-xs text-red-600">{errors[`schedules.${index}.location`]}</p>
                                     )}

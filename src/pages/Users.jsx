@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchUsers } from "../store/slices/userSlice";
-import { FiUser, FiSearch, FiFilter, FiEdit, FiEye } from "react-icons/fi";
+import { FiUser, FiSearch, FiFilter, FiEdit, FiEye, FiUserPlus } from "react-icons/fi";
+import RegisterUserModal from "../components/modals/RegisterUserModal";
 
-// Helper function to format dates safely
+// Helper function to format dates safely with time
 const formatDate = (dateString) => {
    if (!dateString) return "N/A";
 
@@ -21,14 +22,23 @@ const formatDate = (dateString) => {
          return "Invalid Date";
       }
 
-      // Format the date as MM/DD/YYYY
-      const options = {
+      // Format the date as MM/DD/YYYY, HH:MM AM/PM
+      const dateOptions = {
          year: "numeric",
          month: "numeric",
          day: "numeric",
       };
 
-      return date.toLocaleDateString(undefined, options);
+      const timeOptions = {
+         hour: "2-digit",
+         minute: "2-digit",
+         hour12: true,
+      };
+
+      const formattedDate = date.toLocaleDateString(undefined, dateOptions);
+      const formattedTime = date.toLocaleTimeString(undefined, timeOptions);
+
+      return `${formattedDate}, ${formattedTime}`;
    } catch (error) {
       console.error("Error formatting date:", error, "for date string:", dateString);
       return "Invalid Date";
@@ -45,6 +55,9 @@ const Users = () => {
       email: "",
       name: "",
    });
+
+   // State for register user modal
+   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
    // Track current page in component state
    const [currentPageState, setCurrentPageState] = useState(1);
@@ -91,16 +104,36 @@ const Users = () => {
       dispatch(fetchUsers({ page: 1, size: pageSize, filters }));
    };
 
+   // Open register user modal
+   const handleOpenRegisterModal = () => {
+      setIsRegisterModalOpen(true);
+   };
+
+   // Close register user modal
+   const handleCloseRegisterModal = () => {
+      setIsRegisterModalOpen(false);
+      // Refresh the user list after registration
+      dispatch(fetchUsers({ page: currentPageState, size: pageSize, filters }));
+   };
+
    return (
       <div className="p-6">
          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Users</h1>
-            <button
-               onClick={() => navigate("/users/new")}
-               className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700"
-            >
-               Add User
-            </button>
+            <h1 className="text-xl font-medium">Users</h1>
+            <div className="flex space-x-3">
+               <button
+                  onClick={handleOpenRegisterModal}
+                  className="bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700 flex items-center text-sm"
+               >
+                  <FiUserPlus className="mr-1" /> Quick Register
+               </button>
+               <button
+                  onClick={() => navigate("/users/new")}
+                  className="bg-primary-600 text-white px-3 py-1.5 rounded-md hover:bg-primary-700 flex items-center text-sm"
+               >
+                  <FiUser className="mr-1" /> Add User
+               </button>
+            </div>
          </div>
 
          {/* Filters */}
@@ -430,6 +463,9 @@ const Users = () => {
                </div>
             )}
          </div>
+
+         {/* Register User Modal */}
+         <RegisterUserModal isOpen={isRegisterModalOpen} onClose={handleCloseRegisterModal} />
       </div>
    );
 };

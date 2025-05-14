@@ -23,14 +23,10 @@ export const formatTimestamp = (timestamp, options = {}) => {
       const defaultOptions = {
         year: 'numeric',
         month: 'numeric',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       };
-
-      // For created_at and updated_at, include time
-      if (options.includeTime) {
-        defaultOptions.hour = '2-digit';
-        defaultOptions.minute = '2-digit';
-      }
 
       return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });
     }
@@ -49,7 +45,9 @@ export const formatTimestamp = (timestamp, options = {}) => {
       const defaultOptions = {
         year: 'numeric',
         month: 'numeric',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       };
 
       return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });
@@ -61,7 +59,9 @@ export const formatTimestamp = (timestamp, options = {}) => {
       const defaultOptions = {
         year: 'numeric',
         month: 'numeric',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       };
 
       return timestamp.toLocaleDateString(undefined, { ...defaultOptions, ...options });
@@ -97,7 +97,9 @@ export const formatDate = (dateString, options = {}) => {
     const defaultOptions = {
       year: 'numeric',
       month: 'numeric',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     };
 
     return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });

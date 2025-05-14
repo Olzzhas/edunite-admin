@@ -4,6 +4,7 @@ import { fetchThreads, updateThread, createThreadWithSchedule } from "../store/s
 import { fetchCourses } from "../store/slices/courseSlice";
 import { fetchSemesters } from "../store/slices/semesterSlice";
 import { fetchUsers } from "../store/slices/userSlice";
+import { fetchLocations } from "../store/slices/locationSlice";
 import {
    FiFilter,
    FiUsers,
@@ -32,6 +33,7 @@ const Threads = () => {
    const { courses } = useSelector((state) => state.courses);
    const { semesters } = useSelector((state) => state.semesters);
    const { users } = useSelector((state) => state.users);
+   const { locations } = useSelector((state) => state.locations);
 
    // State for edit modal
    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -60,6 +62,7 @@ const Threads = () => {
       dispatch(fetchCourses({ page: 1, size: 100 }));
       dispatch(fetchSemesters());
       dispatch(fetchUsers({ page: 1, size: 100 }));
+      dispatch(fetchLocations({ page: 1, size: 100 }));
    }, [dispatch]);
 
    // Apply filters when threads or filter values change
@@ -495,6 +498,7 @@ const Threads = () => {
             courses={courses}
             semesters={semesters}
             teachers={teachers}
+            locations={locations}
          />
 
          {/* Thread Details Modal */}

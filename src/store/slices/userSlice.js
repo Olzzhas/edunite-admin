@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { userService } from '../../services/api';
+import { userService, registerService } from '../../services/api';
 
 // Async thunks
 export const fetchUsers = createAsyncThunk(
@@ -154,6 +154,18 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+export const registerUser = createAsyncThunk(
+  'users/registerUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await registerService.registerUser(userData);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to register user');
+    }
+  }
+);
+
 // Initial state
 const initialState = {
   users: [],
@@ -268,6 +280,22 @@ const userSlice = createSlice({
         }
       })
       .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Register user
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally add the registered user to the list if needed
+        // state.users.push(action.payload);
+        // state.totalElements += 1;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
