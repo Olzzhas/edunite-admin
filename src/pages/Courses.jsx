@@ -193,7 +193,7 @@ const Courses = () => {
                </div>
             ) : error ? (
                <div className="col-span-full text-center py-12 text-red-500">{error}</div>
-            ) : courses.length === 0 ? (
+            ) : courses == null || courses.length === 0 ? (
                <div className="col-span-full text-center py-12">No courses found</div>
             ) : (
                courses.map((course) => (

@@ -163,11 +163,12 @@ const semesterSlice = createSlice({
       })
       .addCase(fetchSemesters.fulfilled, (state, action) => {
         state.loading = false;
-        state.semesters = action.payload;
+        state.semesters = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchSemesters.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.semesters = []; // Ensure semesters is always an array
       })
 
       // Fetch semester by ID

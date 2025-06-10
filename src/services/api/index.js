@@ -11,6 +11,9 @@ import attendanceService from './attendanceService';
 import sportService from './sportService';
 import registerService from './registerService';
 import locationService from './locationService';
+import degreeService from './degreeService';
+import transcriptService from './transcriptService';
+import studentDegreeService from './studentDegreeService';
 
 export {
   apiClient,
@@ -26,6 +29,9 @@ export {
   sportService,
   registerService,
   locationService,
+  degreeService,
+  transcriptService,
+  studentDegreeService,
 };
 
 // Export mock data for development

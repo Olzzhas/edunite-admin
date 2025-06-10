@@ -264,11 +264,13 @@ const Threads = () => {
                         className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                      >
                         <option value="">All Semesters</option>
-                        {semesters.map((semester) => (
-                           <option key={semester.id} value={semester.id}>
-                              {semester.name}
-                           </option>
-                        ))}
+                        {semesters &&
+                           Array.isArray(semesters) &&
+                           semesters.map((semester) => (
+                              <option key={semester.id} value={semester.id}>
+                                 {semester.name}
+                              </option>
+                           ))}
                      </select>
                   </div>
                </div>
@@ -308,7 +310,8 @@ const Threads = () => {
                   {paginatedThreads.map((thread) => {
                      // The course is now nested in the thread object
                      const course = thread.course;
-                     const semester = semesters.find((s) => s.id === thread.semester_id);
+                     const semester =
+                        semesters && Array.isArray(semesters) ? semesters.find((s) => s.id === thread.semester_id) : null;
 
                      return (
                         <div key={thread.id} className="p-6 hover:bg-gray-50">
@@ -507,7 +510,11 @@ const Threads = () => {
             onClose={handleCloseDetailsModal}
             thread={selectedThreadForDetails}
             course={selectedThreadForDetails ? courses.find((c) => c.id === selectedThreadForDetails.course_id) : null}
-            semester={selectedThreadForDetails ? semesters.find((s) => s.id === selectedThreadForDetails.semester_id) : null}
+            semester={
+               selectedThreadForDetails && semesters && Array.isArray(semesters)
+                  ? semesters.find((s) => s.id === selectedThreadForDetails.semester_id)
+                  : null
+            }
             teacher={selectedThreadForDetails ? teachers.find((t) => t.id === selectedThreadForDetails.teacher_id) : null}
          />
       </div>

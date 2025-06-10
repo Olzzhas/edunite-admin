@@ -25,6 +25,11 @@ import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
 import HealthCheck from "./pages/HealthCheck";
 
+// Import pages for academic records
+import Degrees from "./pages/Degrees";
+import Transcripts from "./pages/Transcripts";
+import StudentDegrees from "./pages/StudentDegrees";
+
 // Import pages for the sport service
 import Sport from "./pages/Sport";
 import SportTypes from "./pages/Sport/SportTypes";
@@ -67,6 +72,11 @@ function App() {
                            <Route path="health-check" element={<HealthCheck />} />
                            <Route path="storage" element={<Storage />} />
                            <Route path="logs" element={<Logs />} />
+
+                           {/* Academic records routes */}
+                           <Route path="degrees" element={<Degrees />} />
+                           <Route path="transcripts" element={<Transcripts />} />
+                           <Route path="student-degrees" element={<StudentDegrees />} />
 
                            {/* Sport service routes */}
                            <Route path="sport" element={<Sport />} />

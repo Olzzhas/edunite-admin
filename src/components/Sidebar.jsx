@@ -18,6 +18,7 @@ import {
    FiActivity,
    FiMapPin,
    FiServer,
+   FiAward,
 } from "react-icons/fi";
 
 const Sidebar = ({ collapsed, toggleSidebar }) => {
@@ -40,6 +41,14 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
             { name: "Threads", icon: <FiLayers size={18} />, path: "/threads" },
             { name: "Assignments", icon: <FiClipboard size={18} />, path: "/assignments" },
             { name: "Locations", icon: <FiMapPin size={18} />, path: "/locations" },
+         ],
+      },
+      {
+         title: "Academic Records",
+         items: [
+            { name: "Degrees", icon: <FiBook size={18} />, path: "/degrees" },
+            { name: "Transcripts", icon: <FiFileText size={18} />, path: "/transcripts" },
+            { name: "Student Degrees", icon: <FiAward size={18} />, path: "/student-degrees" },
          ],
       },
       {

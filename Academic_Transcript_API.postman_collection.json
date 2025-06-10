@@ -1,0 +1,297 @@
+{
+	"info": {
+		"_postman_id": "academic-transcript-api",
+		"name": "Academic Transcript API",
+		"description": "API для управления академическими транскриптами студентов",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "local",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "your_admin_token_here",
+			"type": "string"
+		},
+		{
+			"key": "teacher_token",
+			"value": "your_teacher_token_here",
+			"type": "string"
+		},
+		{
+			"key": "student_token",
+			"value": "your_student_token_here",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Degree Management",
+			"item": [
+				{
+					"name": "List Degrees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/api/degrees?page=1&page_size=10&level=bachelor",
+							"host": ["{{local}}"],
+							"path": ["api", "degrees"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "page_size", "value": "10"},
+								{"key": "level", "value": "bachelor"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Degree by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/api/degrees/1",
+							"host": ["{{local}}"],
+							"path": ["api", "degrees", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Degree",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Бакалавр компьютерных наук\",\n  \"level\": \"bachelor\",\n  \"description\": \"Программа бакалавриата по информатике\",\n  \"required_credits\": 120,\n  \"min_gpa\": 2.0\n}"
+						},
+						"url": {
+							"raw": "{{local}}/api/degrees",
+							"host": ["{{local}}"],
+							"path": ["api", "degrees"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Transcript Management",
+			"item": [
+				{
+					"name": "Create Transcript",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 123,\n  \"degree_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{local}}/api/transcripts",
+							"host": ["{{local}}"],
+							"path": ["api", "transcripts"]
+						}
+					}
+				},
+				{
+					"name": "Get Student Transcript",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/transcripts/user/123?degree_id=1",
+							"host": ["{{local}}"],
+							"path": ["api", "transcripts", "user", "123"],
+							"query": [
+								{"key": "degree_id", "value": "1"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Transcript Entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{teacher_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"transcript_id\": 1,\n  \"course_id\": 5,\n  \"thread_id\": 10,\n  \"semester_id\": 2,\n  \"grade_letter\": \"A\",\n  \"grade_numeric\": 95.0,\n  \"grade_points\": 4.0,\n  \"credits\": 3,\n  \"is_transfer\": false,\n  \"is_repeated\": false,\n  \"completion_date\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{local}}/api/transcripts/entries",
+							"host": ["{{local}}"],
+							"path": ["api", "transcripts", "entries"]
+						}
+					}
+				},
+				{
+					"name": "Get Transcript Entries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/transcripts/1/entries?semester_id=2",
+							"host": ["{{local}}"],
+							"path": ["api", "transcripts", "1", "entries"],
+							"query": [
+								{"key": "semester_id", "value": "2"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update GPA",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/transcripts/1/gpa",
+							"host": ["{{local}}"],
+							"path": ["api", "transcripts", "1", "gpa"]
+						}
+					}
+				},
+				{
+					"name": "Generate Transcript Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/transcripts/user/123/report?degree_id=1&include_transfer_credits=true&include_repeated_courses=false",
+							"host": ["{{local}}"],
+							"path": ["api", "transcripts", "user", "123", "report"],
+							"query": [
+								{"key": "degree_id", "value": "1"},
+								{"key": "include_transfer_credits", "value": "true"},
+								{"key": "include_repeated_courses", "value": "false"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Student Degree Management",
+			"item": [
+				{
+					"name": "Create Student Degree",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 123,\n  \"degree_id\": 1,\n  \"start_date\": \"2023-09-01\",\n  \"expected_graduation_date\": \"2027-06-01\"\n}"
+						},
+						"url": {
+							"raw": "{{local}}/api/student-degrees",
+							"host": ["{{local}}"],
+							"path": ["api", "student-degrees"]
+						}
+					}
+				},
+				{
+					"name": "Get Student Degrees",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/student-degrees/user/123",
+							"host": ["{{local}}"],
+							"path": ["api", "student-degrees", "user", "123"]
+						}
+					}
+				},
+				{
+					"name": "Update Degree Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"completed\",\n  \"actual_graduation_date\": \"2027-06-15\",\n  \"final_gpa\": 3.67\n}"
+						},
+						"url": {
+							"raw": "{{local}}/api/student-degrees/1/status",
+							"host": ["{{local}}"],
+							"path": ["api", "student-degrees", "1", "status"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

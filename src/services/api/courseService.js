@@ -111,8 +111,15 @@ const courseService = {
 
       return newCourse;
     } else {
-      const response = await apiClient.post('/course', courseData);
-      return response.data;
+      // If courseData is FormData, it's coming from the modal with image
+      if (courseData instanceof FormData) {
+        const response = await apiClient.post('/course/with-image', courseData);
+        return response.data;
+      } else {
+        // Regular course creation without image
+        const response = await apiClient.post('/course', courseData);
+        return response.data;
+      }
     }
   },
 
