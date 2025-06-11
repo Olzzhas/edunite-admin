@@ -140,3 +140,28 @@ export const formatServiceName = (service) => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 };
+
+/**
+ * Get the appropriate badge class for a log level
+ * @param {string} level - The log level (e.g., 'error', 'info', 'warning')
+ * @returns {string} - Tailwind CSS class for badge
+ */
+export const getLevelBadgeClass = (level) => {
+  const normalizedLevel = level?.toLowerCase() || '';
+
+  switch (normalizedLevel) {
+    case 'error':
+      return 'bg-red-100 text-red-800';
+    case 'warn':
+    case 'warning':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'info':
+      return 'bg-blue-100 text-blue-800';
+    case 'debug':
+      return 'bg-purple-100 text-purple-800';
+    case 'trace':
+      return 'bg-gray-100 text-gray-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
