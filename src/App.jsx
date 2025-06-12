@@ -27,6 +27,8 @@ import HealthCheck from "./pages/HealthCheck";
 
 // Import pages for academic records
 import Degrees from "./pages/Degrees";
+import DegreeCourses from "./pages/DegreeCourses";
+import StudentCoursesTest from "./pages/StudentCoursesTest";
 import Transcripts from "./pages/Transcripts";
 import StudentDegrees from "./pages/StudentDegrees";
 
@@ -75,6 +77,8 @@ function App() {
 
                            {/* Academic records routes */}
                            <Route path="degrees" element={<Degrees />} />
+                           <Route path="degree-courses" element={<DegreeCourses />} />
+                           <Route path="student-courses-test" element={<StudentCoursesTest />} />
                            <Route path="transcripts" element={<Transcripts />} />
                            <Route path="student-degrees" element={<StudentDegrees />} />
 

@@ -21,6 +21,13 @@ const transcriptService = {
       return response.data;
     } catch (error) {
       console.error(`Error fetching transcript for user ${userId}:`, error);
+
+      // Handle 404 errors specifically for transcript not found
+      if (error.response && error.response.status === 404) {
+        const errorMessage = error.response.data?.error || 'Transcript not found';
+        throw new Error(errorMessage);
+      }
+
       throw error;
     }
   },

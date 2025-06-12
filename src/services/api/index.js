@@ -14,6 +14,7 @@ import locationService from './locationService';
 import degreeService from './degreeService';
 import transcriptService from './transcriptService';
 import studentDegreeService from './studentDegreeService';
+import degreeCourseService from './degreeCourseService';
 
 export {
   apiClient,
@@ -32,6 +33,7 @@ export {
   degreeService,
   transcriptService,
   studentDegreeService,
+  degreeCourseService,
 };
 
 // Export mock data for development

@@ -300,8 +300,22 @@ const Transcripts = () => {
 
          {/* Error Display */}
          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-               <p className="text-red-800">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+               <div className="flex items-center">
+                  <FiFileText className="h-6 w-6 text-red-600 mr-3" />
+                  <div>
+                     <h3 className="text-lg font-medium text-red-800 mb-1">
+                        {error.includes("Transcript not found") ? "Transcript Not Found" : "Error"}
+                     </h3>
+                     <p className="text-red-700">{error}</p>
+                     {error.includes("Transcript not found") && (
+                        <p className="text-red-600 text-sm mt-2">
+                           This student may not have a transcript for the selected degree program, or no transcript has been
+                           created yet.
+                        </p>
+                     )}
+                  </div>
+               </div>
             </div>
          )}
 

@@ -62,25 +62,27 @@ const StudentDegrees = () => {
       setIsEditModalOpen(true);
    };
 
-   const handleDeleteStudentDegree = (studentDegree) => {
+   const handleDeleteStudentDegree = async (studentDegree) => {
       const studentName = getStudentName(studentDegree.user_id);
       const degreeName = studentDegree.degree?.name || "Unknown Degree";
 
-      showAlert({
+      const confirmed = await showAlert({
          title: "Delete Student Degree",
          message: `Are you sure you want to delete the degree enrollment for ${studentName} in ${degreeName}? This action cannot be undone.`,
-         type: "danger",
-         onConfirm: () => {
-            dispatch(deleteStudentDegree(studentDegree.id))
-               .unwrap()
-               .then(() => {
-                  addToast("Student degree deleted successfully!", "success");
-               })
-               .catch((error) => {
-                  addToast(`Failed to delete student degree: ${error}`, "error");
-               });
-         },
+         type: "delete",
+         confirmText: "Delete",
+         cancelText: "Cancel",
       });
+
+      if (confirmed) {
+         try {
+            await dispatch(deleteStudentDegree(studentDegree.id)).unwrap();
+            addToast("Student degree deleted successfully!", "success");
+         } catch (error) {
+            console.error("Error deleting student degree:", error);
+            addToast(`Failed to delete student degree: ${error}`, "error");
+         }
+      }
    };
 
    const handleCloseCreateModal = () => {

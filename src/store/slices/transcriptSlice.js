@@ -27,6 +27,12 @@ export const fetchStudentTranscript = createAsyncThunk(
       return response;
     } catch (error) {
       console.error(`Error in fetchStudentTranscript thunk for user ${userId}:`, error);
+
+      // Handle transcript not found specifically
+      if (error.message && error.message.includes('Transcript not found')) {
+        return rejectWithValue('Transcript not found for this student and degree program');
+      }
+
       return rejectWithValue(error.message || 'Failed to fetch student transcript');
     }
   }

@@ -47,6 +47,8 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
          title: "Academic Records",
          items: [
             { name: "Degrees", icon: <FiBook size={18} />, path: "/degrees" },
+            { name: "Degree Courses", icon: <FiLayers size={18} />, path: "/degree-courses" },
+            { name: "Student Courses Test", icon: <FiUser size={18} />, path: "/student-courses-test" },
             { name: "Transcripts", icon: <FiFileText size={18} />, path: "/transcripts" },
             { name: "Student Degrees", icon: <FiAward size={18} />, path: "/student-degrees" },
          ],

@@ -8,6 +8,9 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
    const dispatch = useDispatch();
    const { courses } = useSelector((state) => state.courses);
 
+   // Ensure courses is always an array to prevent map errors
+   const coursesList = Array.isArray(courses) ? courses : [];
+
    const [formData, setFormData] = useState({
       title: "",
       description: "",
@@ -228,8 +231,8 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                            id="prerequisite_course_ids"
                            name="prerequisite_course_ids"
                            isMulti
-                           options={courses.map((course) => ({ value: course.id, label: course.title }))}
-                           value={courses
+                           options={coursesList.map((course) => ({ value: course.id, label: course.title }))}
+                           value={coursesList
                               .filter((c) => formData.prerequisite_course_ids.includes(c.id))
                               .map((c) => ({ value: c.id, label: c.title }))}
                            onChange={(selected) => {

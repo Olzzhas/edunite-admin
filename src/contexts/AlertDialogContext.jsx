@@ -19,6 +19,7 @@ export const AlertDialogProvider = ({ children }) => {
       confirmText: "Confirm",
       cancelText: "Cancel",
       onConfirm: () => {},
+      onCancel: () => {},
       type: "confirm",
    });
 
@@ -36,6 +37,26 @@ export const AlertDialogProvider = ({ children }) => {
 
    const closeDialog = () => {
       setDialogState((prev) => ({ ...prev, isOpen: false }));
+   };
+
+   // Promise-based showAlert method
+   const showAlert = ({ title, message, type = "confirm", confirmText = "Confirm", cancelText = "Cancel" }) => {
+      return new Promise((resolve) => {
+         setDialogState({
+            isOpen: true,
+            title,
+            message,
+            confirmText,
+            cancelText,
+            type,
+            onConfirm: () => {
+               resolve(true);
+            },
+            onCancel: () => {
+               resolve(false);
+            },
+         });
+      });
    };
 
    // Convenience methods for common dialog types
@@ -62,6 +83,7 @@ export const AlertDialogProvider = ({ children }) => {
          value={{
             openDialog,
             closeDialog,
+            showAlert,
             confirm,
             deleteConfirm,
             info,
@@ -77,6 +99,7 @@ export const AlertDialogProvider = ({ children }) => {
             confirmText={dialogState.confirmText}
             cancelText={dialogState.cancelText}
             onConfirm={dialogState.onConfirm}
+            onCancel={dialogState.onCancel}
             type={dialogState.type}
          />
       </AlertDialogContext.Provider>

@@ -96,6 +96,12 @@ apiClient.interceptors.response.use(
     // Handle 404 errors for API endpoints
     if (error.response.status === 404) {
       console.error('API endpoint not found:', originalRequest.url);
+
+      // Don't use global error handler for transcript-related 404s
+      // These should be handled by the component/service level
+      if (originalRequest.url && originalRequest.url.includes('/transcripts/user/')) {
+        return Promise.reject(error);
+      }
     }
 
     // Use the global error handler if available
