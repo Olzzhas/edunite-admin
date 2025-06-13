@@ -4,6 +4,7 @@ import store from "./store";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
+import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import Login from "./pages/auth/Login";
 import UnauthorizedPage from "./pages/auth/Unauthorized";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -24,6 +25,8 @@ import Locations from "./pages/Locations";
 import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
 import HealthCheck from "./pages/HealthCheck";
+import Notifications from "./pages/Notifications";
+import NotificationTest from "./pages/NotificationTest";
 
 // Import pages for academic records
 import Degrees from "./pages/Degrees";
@@ -61,6 +64,7 @@ function App() {
                            <Route index element={<Navigate to="/dashboard" />} />
                            <Route path="dashboard" element={<Dashboard />} />
                            <Route path="analytics" element={<Analytics />} />
+                           <Route path="advanced-analytics" element={<AdvancedAnalytics />} />
 
                            {/* Admin panel routes */}
                            <Route path="users" element={<Users />} />
@@ -71,6 +75,8 @@ function App() {
                            <Route path="threads" element={<Threads />} />
                            <Route path="assignments" element={<Assignments />} />
                            <Route path="locations" element={<Locations />} />
+                           <Route path="notifications" element={<Notifications />} />
+                           <Route path="notification-test" element={<NotificationTest />} />
                            <Route path="health-check" element={<HealthCheck />} />
                            <Route path="storage" element={<Storage />} />
                            <Route path="logs" element={<Logs />} />

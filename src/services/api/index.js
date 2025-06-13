@@ -15,6 +15,8 @@ import degreeService from './degreeService';
 import transcriptService from './transcriptService';
 import studentDegreeService from './studentDegreeService';
 import degreeCourseService from './degreeCourseService';
+import notificationService from './notificationService';
+import analyticsService from './analyticsService';
 
 export {
   apiClient,
@@ -34,6 +36,8 @@ export {
   transcriptService,
   studentDegreeService,
   degreeCourseService,
+  notificationService,
+  analyticsService,
 };
 
 // Export mock data for development

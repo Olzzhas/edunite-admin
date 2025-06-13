@@ -19,6 +19,8 @@ import {
    FiMapPin,
    FiServer,
    FiAward,
+   FiBell,
+   FiTool,
 } from "react-icons/fi";
 
 const Sidebar = ({ collapsed, toggleSidebar }) => {
@@ -30,6 +32,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
          items: [
             { name: "Dashboard", icon: <FiHome size={18} />, path: "/dashboard" },
             { name: "Analytics", icon: <FiBarChart2 size={18} />, path: "/analytics" },
+            { name: "Advanced Analytics", icon: <FiBarChart2 size={18} />, path: "/advanced-analytics" },
          ],
       },
       {
@@ -41,6 +44,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
             { name: "Threads", icon: <FiLayers size={18} />, path: "/threads" },
             { name: "Assignments", icon: <FiClipboard size={18} />, path: "/assignments" },
             { name: "Locations", icon: <FiMapPin size={18} />, path: "/locations" },
+            { name: "Notifications", icon: <FiBell size={18} />, path: "/notifications" },
          ],
       },
       {
@@ -70,6 +74,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
             { name: "Health Check", icon: <FiServer size={18} />, path: "/health-check" },
             { name: "Storage", icon: <FiHardDrive size={18} />, path: "/storage" },
             { name: "Logs", icon: <FiDatabase size={18} />, path: "/logs" },
+            { name: "Notification Test", icon: <FiTool size={18} />, path: "/notification-test" },
             { name: "Settings", icon: <FiSettings size={18} />, path: "/settings" },
          ],
       },

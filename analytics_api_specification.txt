@@ -1,0 +1,459 @@
+СПЕЦИФИКАЦИЯ API ДЛЯ DASHBOARD И ANALYTICS
+===========================================
+
+Данная спецификация описывает необходимые эндпоинты API для замены моковых данных 
+в страницах Dashboard и Analytics реальной статистикой.
+
+1. DASHBOARD OVERVIEW - ОСНОВНЫЕ МЕТРИКИ
+========================================
+
+Эндпоинт: GET /api/analytics/overview
+
+Формат ответа:
+{
+  "stats": {
+    "totalUsers": {
+      "value": 2318,
+      "trend": "up",
+      "trendValue": "+6.08%",
+      "previousPeriodValue": 2185
+    },
+    "totalCourses": {
+      "value": 156,
+      "trend": "up", 
+      "trendValue": "+15.03%",
+      "previousPeriodValue": 135
+    },
+    "totalThreads": {
+      "value": 3671,
+      "trend": "down",
+      "trendValue": "-0.03%",
+      "previousPeriodValue": 3672
+    },
+    "activeStudents": {
+      "value": 7265,
+      "trend": "up",
+      "trendValue": "+11.01%",
+      "previousPeriodValue": 6540
+    }
+  },
+  "period": "last_30_days"
+}
+
+2. ПОЛЬЗОВАТЕЛИ ПО ВРЕМЕНИ (ГРАФИК)
+===================================
+
+Эндпоинт: GET /api/analytics/users-timeline
+
+Параметры: 
+- period (optional): 7d, 30d, 90d, 1y (default: 30d)
+- granularity (optional): day, week, month (default: day)
+
+Формат ответа:
+{
+  "timeline": [
+    {
+      "date": "2024-01-01",
+      "totalUsers": 10000,
+      "newUsers": 150,
+      "activeUsers": 8500
+    },
+    {
+      "date": "2024-01-02", 
+      "totalUsers": 10150,
+      "newUsers": 200,
+      "activeUsers": 8700
+    }
+  ],
+  "comparison": {
+    "previousPeriod": [
+      {
+        "date": "2023-12-01",
+        "totalUsers": 5000,
+        "newUsers": 100,
+        "activeUsers": 4200
+      }
+    ]
+  }
+}
+
+3. СТАТИСТИКА ПО УСТРОЙСТВАМ И ЛОКАЦИЯМ
+=======================================
+
+Эндпоинт: GET /api/analytics/user-demographics
+
+Формат ответа:
+{
+  "devices": [
+    { "name": "Windows", "value": 30, "percentage": 30.0 },
+    { "name": "Mac", "value": 25, "percentage": 25.0 },
+    { "name": "Linux", "value": 15, "percentage": 15.0 },
+    { "name": "iOS", "value": 20, "percentage": 20.0 },
+    { "name": "Android", "value": 15, "percentage": 15.0 },
+    { "name": "Other", "value": 5, "percentage": 5.0 }
+  ],
+  "locations": [
+    { "name": "Kazakhstan", "value": 52.1, "percentage": 52.1 },
+    { "name": "Russia", "value": 22.8, "percentage": 22.8 },
+    { "name": "USA", "value": 13.9, "percentage": 13.9 },
+    { "name": "Other", "value": 11.2, "percentage": 11.2 }
+  ]
+}
+
+4. ПОСЛЕДНИЕ АКТИВНОСТИ (ТАБЛИЦА)
+=================================
+
+Эндпоинт: GET /api/analytics/recent-activities
+
+Параметры:
+- limit (optional): количество записей (default: 10)
+- type (optional): enrollment, assignment, login, all (default: all)
+
+Формат ответа:
+{
+  "activities": [
+    {
+      "id": "ACT-001",
+      "type": "enrollment",
+      "user": {
+        "id": 123,
+        "name": "John Doe",
+        "email": "john@example.com"
+      },
+      "course": {
+        "id": 45,
+        "title": "Introduction to Computer Science"
+      },
+      "date": "2024-01-15T10:30:00Z",
+      "status": "completed"
+    },
+    {
+      "id": "ACT-002", 
+      "type": "assignment_submission",
+      "user": {
+        "id": 124,
+        "name": "Jane Smith",
+        "email": "jane@example.com"
+      },
+      "assignment": {
+        "id": 67,
+        "title": "Final Project"
+      },
+      "date": "2024-01-15T09:45:00Z",
+      "status": "pending"
+    }
+  ]
+}
+
+5. ANALYTICS - ДЕТАЛЬНАЯ АНАЛИТИКА
+==================================
+
+Эндпоинт: GET /api/analytics/detailed-stats
+
+Параметры:
+- period: 7d, 30d, 90d, 1y
+- metrics: revenue, activity, performance (можно несколько через запятую)
+
+Формат ответа:
+{
+  "courseEnrollments": {
+    "timeline": [
+      {
+        "date": "2024-01-01",
+        "enrollments": 12000,
+        "completions": 8500
+      }
+    ],
+    "comparison": {
+      "previousPeriod": [
+        {
+          "date": "2023-01-01", 
+          "enrollments": 10000,
+          "completions": 7200
+        }
+      ]
+    }
+  },
+  "userActivity": {
+    "daily": [
+      { "day": "Monday", "activeUsers": 420 },
+      { "day": "Tuesday", "activeUsers": 380 },
+      { "day": "Wednesday", "activeUsers": 450 },
+      { "day": "Thursday", "activeUsers": 520 },
+      { "day": "Friday", "activeUsers": 490 },
+      { "day": "Saturday", "activeUsers": 380 },
+      { "day": "Sunday", "activeUsers": 320 }
+    ]
+  },
+  "trafficSources": [
+    { "source": "Direct", "value": 35, "percentage": 35.0 },
+    { "source": "Organic Search", "value": 25, "percentage": 25.0 },
+    { "source": "Referral", "value": 15, "percentage": 15.0 },
+    { "source": "Social Media", "value": 15, "percentage": 15.0 },
+    { "source": "Email", "value": 8, "percentage": 8.0 },
+    { "source": "Other", "value": 2, "percentage": 2.0 }
+  ]
+}
+
+6. КЛЮЧЕВЫЕ МЕТРИКИ ПРОИЗВОДИТЕЛЬНОСТИ
+======================================
+
+Эндпоинт: GET /api/analytics/performance-metrics
+
+Формат ответа:
+{
+  "metrics": {
+    "courseCompletionRate": {
+      "value": 3.2,
+      "unit": "%",
+      "trend": "up",
+      "change": "+0.5%",
+      "description": "Course completion rate"
+    },
+    "averageGrade": {
+      "value": 85.20,
+      "unit": "points",
+      "trend": "up", 
+      "change": "+3.50",
+      "description": "Average assignment grade"
+    },
+    "attendanceRate": {
+      "value": 42.8,
+      "unit": "%",
+      "trend": "down",
+      "change": "-2.1%", 
+      "description": "Average attendance rate"
+    },
+    "averageSessionDuration": {
+      "value": "2m 45s",
+      "unit": "time",
+      "trend": "up",
+      "change": "+15s",
+      "description": "Average session duration"
+    }
+  }
+}
+
+7. ДОПОЛНИТЕЛЬНЫЕ ЭНДПОИНТЫ
+===========================
+
+Курсы:
+- GET /api/analytics/courses/popular - самые популярные курсы
+- GET /api/analytics/courses/completion-rates - статистика завершения курсов
+
+Студенты:
+- GET /api/analytics/students/engagement - вовлеченность студентов
+- GET /api/analytics/students/performance - успеваемость студентов
+
+Преподаватели:
+- GET /api/analytics/teachers/activity - активность преподавателей
+- GET /api/analytics/teachers/course-load - нагрузка преподавателей
+
+Посещаемость:
+- GET /api/analytics/attendance/trends - тренды посещаемости
+- GET /api/analytics/attendance/by-course - посещаемость по курсам
+
+8. ОБЩИЕ ПАРАМЕТРЫ ФИЛЬТРАЦИИ
+=============================
+
+Все эндпоинты должны поддерживать следующие параметры:
+- start_date и end_date - диапазон дат
+- semester_id - фильтр по семестру
+- course_id - фильтр по курсу
+- degree_id - фильтр по программе обучения
+
+9. ФОРМАТ ОШИБОК
+================
+
+{
+  "error": {
+    "code": "ANALYTICS_ERROR",
+    "message": "Unable to fetch analytics data",
+    "details": "Database connection failed"
+  }
+}
+
+ПРИМЕЧАНИЯ
+==========
+
+1. Все даты должны быть в формате ISO 8601 (YYYY-MM-DDTHH:mm:ssZ)
+2. Тренды могут быть: "up", "down", "neutral"
+3. Процентные значения должны быть числами с плавающей точкой
+4. Все эндпоинты должны поддерживать CORS для фронтенда
+5. Требуется авторизация через Bearer token для всех эндпоинтов
+
+ДОПОЛНИТЕЛЬНЫЕ ДЕТАЛИ ДЛЯ ЭНДПОИНТОВ
+====================================
+
+7.1. ПОПУЛЯРНЫЕ КУРСЫ
+GET /api/analytics/courses/popular
+Параметры: limit (default: 10), period (default: 30d)
+Ответ:
+{
+  "courses": [
+    {
+      "id": 1,
+      "title": "Introduction to Computer Science",
+      "enrollments": 245,
+      "completions": 189,
+      "rating": 4.8,
+      "trend": "up"
+    }
+  ]
+}
+
+7.2. СТАТИСТИКА ЗАВЕРШЕНИЯ КУРСОВ
+GET /api/analytics/courses/completion-rates
+Ответ:
+{
+  "overall": {
+    "completionRate": 76.5,
+    "averageTime": "45 days"
+  },
+  "byCourse": [
+    {
+      "courseId": 1,
+      "title": "Course Name",
+      "completionRate": 85.2,
+      "enrollments": 120,
+      "completions": 102
+    }
+  ]
+}
+
+7.3. ВОВЛЕЧЕННОСТЬ СТУДЕНТОВ
+GET /api/analytics/students/engagement
+Ответ:
+{
+  "metrics": {
+    "dailyActiveUsers": 1250,
+    "weeklyActiveUsers": 3400,
+    "monthlyActiveUsers": 8900,
+    "averageSessionTime": "25m 30s",
+    "averageCoursesPerStudent": 2.3
+  },
+  "engagement_levels": [
+    { "level": "High", "count": 450, "percentage": 35.2 },
+    { "level": "Medium", "count": 600, "percentage": 46.9 },
+    { "level": "Low", "count": 230, "percentage": 17.9 }
+  ]
+}
+
+7.4. УСПЕВАЕМОСТЬ СТУДЕНТОВ
+GET /api/analytics/students/performance
+Ответ:
+{
+  "grades": {
+    "average": 78.5,
+    "median": 82.0,
+    "distribution": [
+      { "grade": "A", "count": 120, "percentage": 25.0 },
+      { "grade": "B", "count": 180, "percentage": 37.5 },
+      { "grade": "C", "count": 150, "percentage": 31.25 },
+      { "grade": "D", "count": 25, "percentage": 5.2 },
+      { "grade": "F", "count": 5, "percentage": 1.05 }
+    ]
+  },
+  "trends": {
+    "improving": 65,
+    "stable": 25,
+    "declining": 10
+  }
+}
+
+7.5. АКТИВНОСТЬ ПРЕПОДАВАТЕЛЕЙ
+GET /api/analytics/teachers/activity
+Ответ:
+{
+  "metrics": {
+    "totalTeachers": 45,
+    "activeTeachers": 42,
+    "averageCoursesPerTeacher": 3.2,
+    "averageStudentsPerTeacher": 85
+  },
+  "activity": [
+    {
+      "teacherId": 1,
+      "name": "John Smith",
+      "coursesCount": 4,
+      "studentsCount": 120,
+      "lastActivity": "2024-01-15T10:30:00Z",
+      "engagementScore": 8.5
+    }
+  ]
+}
+
+7.6. НАГРУЗКА ПРЕПОДАВАТЕЛЕЙ
+GET /api/analytics/teachers/course-load
+Ответ:
+{
+  "load_distribution": [
+    { "courses": "1-2", "teachers": 15, "percentage": 33.3 },
+    { "courses": "3-4", "teachers": 20, "percentage": 44.4 },
+    { "courses": "5+", "teachers": 10, "percentage": 22.3 }
+  ],
+  "workload": [
+    {
+      "teacherId": 1,
+      "name": "John Smith",
+      "coursesCount": 4,
+      "totalStudents": 120,
+      "weeklyHours": 25,
+      "status": "optimal"
+    }
+  ]
+}
+
+7.7. ТРЕНДЫ ПОСЕЩАЕМОСТИ
+GET /api/analytics/attendance/trends
+Ответ:
+{
+  "overall": {
+    "attendanceRate": 78.5,
+    "trend": "up",
+    "change": "+2.3%"
+  },
+  "timeline": [
+    {
+      "date": "2024-01-01",
+      "attendanceRate": 76.2,
+      "totalSessions": 45,
+      "attendedSessions": 34
+    }
+  ],
+  "by_day_of_week": [
+    { "day": "Monday", "rate": 85.2 },
+    { "day": "Tuesday", "rate": 82.1 },
+    { "day": "Wednesday", "rate": 78.9 },
+    { "day": "Thursday", "rate": 75.6 },
+    { "day": "Friday", "rate": 68.3 }
+  ]
+}
+
+7.8. ПОСЕЩАЕМОСТЬ ПО КУРСАМ
+GET /api/analytics/attendance/by-course
+Ответ:
+{
+  "courses": [
+    {
+      "courseId": 1,
+      "title": "Introduction to Computer Science",
+      "attendanceRate": 85.2,
+      "totalSessions": 24,
+      "averageAttendance": 18,
+      "trend": "up"
+    }
+  ],
+  "statistics": {
+    "bestAttendance": {
+      "courseId": 1,
+      "title": "Course Name",
+      "rate": 95.2
+    },
+    "worstAttendance": {
+      "courseId": 5,
+      "title": "Course Name",
+      "rate": 45.8
+    }
+  }
+}

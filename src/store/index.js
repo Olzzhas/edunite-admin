@@ -17,6 +17,7 @@ import degreeReducer from './slices/degreeSlice';
 import transcriptReducer from './slices/transcriptSlice';
 import studentDegreeReducer from './slices/studentDegreeSlice';
 import degreeCourseReducer from './slices/degreeCourseSlice';
+import notificationReducer from './slices/notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ const store = configureStore({
     transcripts: transcriptReducer,
     studentDegrees: studentDegreeReducer,
     degreeCourses: degreeCourseReducer,
+    notifications: notificationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

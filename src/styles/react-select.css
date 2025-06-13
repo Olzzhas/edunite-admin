@@ -1,0 +1,97 @@
+/* React Select Custom Styles */
+.react-select-container .react-select__control {
+  border-color: #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  min-height: 38px;
+}
+
+.react-select-container .react-select__control:hover {
+  border-color: #9ca3af;
+}
+
+.react-select-container .react-select__control--is-focused {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.react-select-container .react-select__value-container {
+  padding: 2px 8px;
+}
+
+.react-select-container .react-select__input-container {
+  margin: 0;
+  padding: 0;
+}
+
+.react-select-container .react-select__placeholder {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.react-select-container .react-select__single-value {
+  color: #374151;
+  font-size: 14px;
+}
+
+.react-select-container .react-select__menu {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.react-select-container .react-select__option {
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.react-select-container .react-select__option--is-focused {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.react-select-container .react-select__option--is-selected {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.react-select-container .react-select__multi-value {
+  background-color: #e5e7eb;
+  border-radius: 4px;
+}
+
+.react-select-container .react-select__multi-value__label {
+  color: #374151;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.react-select-container .react-select__multi-value__remove {
+  color: #6b7280;
+  border-radius: 0 4px 4px 0;
+}
+
+.react-select-container .react-select__multi-value__remove:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+.react-select-container .react-select__indicator-separator {
+  background-color: #d1d5db;
+}
+
+.react-select-container .react-select__dropdown-indicator {
+  color: #6b7280;
+  padding: 8px;
+}
+
+.react-select-container .react-select__dropdown-indicator:hover {
+  color: #374151;
+}
+
+.react-select-container .react-select__clear-indicator {
+  color: #6b7280;
+  padding: 8px;
+}
+
+.react-select-container .react-select__clear-indicator:hover {
+  color: #dc2626;
+}
