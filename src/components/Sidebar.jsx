@@ -42,7 +42,8 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
             { name: "Courses", icon: <FiBook size={18} />, path: "/courses" },
             { name: "Semesters", icon: <FiCalendar size={18} />, path: "/semesters" },
             { name: "Threads", icon: <FiLayers size={18} />, path: "/threads" },
-            { name: "Assignments", icon: <FiClipboard size={18} />, path: "/assignments" },
+            // { name: "Assignments", icon: <FiClipboard size={18} />, path: "/assignments" },
+            { name: "Registration Management", icon: <FiSettings size={18} />, path: "/registration-management" },
             { name: "Locations", icon: <FiMapPin size={18} />, path: "/locations" },
             { name: "Notifications", icon: <FiBell size={18} />, path: "/notifications" },
          ],
@@ -57,25 +58,25 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
             { name: "Student Degrees", icon: <FiAward size={18} />, path: "/student-degrees" },
          ],
       },
-      {
-         title: "Sport Service",
-         items: [
-            { name: "Sport Overview", icon: <FiActivity size={18} />, path: "/sport" },
-            { name: "Sport Types", icon: <FiActivity size={18} />, path: "/sport/types" },
-            { name: "Facilities", icon: <FiMapPin size={18} />, path: "/sport/facilities" },
-            { name: "Physical Education", icon: <FiUsers size={18} />, path: "/sport/physical-education" },
-            { name: "Schedules", icon: <FiCalendar size={18} />, path: "/sport/schedules" },
-            { name: "Filtered Schedules", icon: <FiCalendar size={18} />, path: "/sport/filtered-schedules" },
-         ],
-      },
+      // {
+      //    title: "Sport Service",
+      //    items: [
+      //       { name: "Sport Overview", icon: <FiActivity size={18} />, path: "/sport" },
+      //       { name: "Sport Types", icon: <FiActivity size={18} />, path: "/sport/types" },
+      //       { name: "Facilities", icon: <FiMapPin size={18} />, path: "/sport/facilities" },
+      //       { name: "Physical Education", icon: <FiUsers size={18} />, path: "/sport/physical-education" },
+      //       { name: "Schedules", icon: <FiCalendar size={18} />, path: "/sport/schedules" },
+      //       { name: "Filtered Schedules", icon: <FiCalendar size={18} />, path: "/sport/filtered-schedules" },
+      //    ],
+      // },
       {
          title: "System",
          items: [
             { name: "Health Check", icon: <FiServer size={18} />, path: "/health-check" },
-            { name: "Storage", icon: <FiHardDrive size={18} />, path: "/storage" },
+            // { name: "Storage", icon: <FiHardDrive size={18} />, path: "/storage" },
             { name: "Logs", icon: <FiDatabase size={18} />, path: "/logs" },
             { name: "Notification Test", icon: <FiTool size={18} />, path: "/notification-test" },
-            { name: "Settings", icon: <FiSettings size={18} />, path: "/settings" },
+            // { name: "Settings", icon: <FiSettings size={18} />, path: "/settings" },
          ],
       },
    ];

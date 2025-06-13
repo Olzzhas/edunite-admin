@@ -7,25 +7,25 @@ const MOCK_API = true;
 const MOCK_OVERVIEW = {
   stats: {
     totalUsers: {
-      value: 2318,
+      value: 16,
       trend: "up",
       trendValue: "+6.08%",
-      previousPeriodValue: 2185
+      previousPeriodValue: 120
     },
     totalCourses: {
-      value: 156,
+      value: 7,
       trend: "up", 
       trendValue: "+15.03%",
       previousPeriodValue: 135
     },
     totalThreads: {
-      value: 3671,
+      value: 8,
       trend: "down",
       trendValue: "-0.03%",
       previousPeriodValue: 3672
     },
     activeStudents: {
-      value: 7265,
+      value: 12,
       trend: "up",
       trendValue: "+11.01%",
       previousPeriodValue: 6540

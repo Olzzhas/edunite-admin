@@ -52,7 +52,7 @@ export const fetchSemesterById = createAsyncThunk(
 );
 
 export const createSemester = createAsyncThunk(
-  'semesters/createSemester',
+  'semester/createSemester',
   async (semesterData, { rejectWithValue }) => {
     try {
       console.log('Creating semester in thunk:', semesterData);
@@ -67,7 +67,7 @@ export const createSemester = createAsyncThunk(
 );
 
 export const updateSemester = createAsyncThunk(
-  'semesters/updateSemester',
+  'semester/updateSemester',
   async ({ id, semesterData }, { rejectWithValue }) => {
     try {
       const response = await semesterService.updateSemester(id, semesterData);
@@ -79,7 +79,7 @@ export const updateSemester = createAsyncThunk(
 );
 
 export const deleteSemester = createAsyncThunk(
-  'semesters/deleteSemester',
+  'semester/deleteSemester',
   async (id, { rejectWithValue }) => {
     try {
       await semesterService.deleteSemester(id);
@@ -91,7 +91,7 @@ export const deleteSemester = createAsyncThunk(
 );
 
 export const addSemesterBreak = createAsyncThunk(
-  'semesters/addSemesterBreak',
+  'semester/addSemesterBreak',
   async ({ semesterId, breakData }, { rejectWithValue }) => {
     try {
       console.log('Adding semester break in thunk:', { semesterId, breakData });
@@ -111,7 +111,7 @@ export const addSemesterBreak = createAsyncThunk(
 );
 
 export const updateSemesterBreak = createAsyncThunk(
-  'semesters/updateSemesterBreak',
+  'semester/updateSemesterBreak',
   async ({ semesterId, breakId, breakData }, { rejectWithValue }) => {
     try {
       const response = await semesterService.updateBreak(semesterId, breakId, breakData);
@@ -123,7 +123,7 @@ export const updateSemesterBreak = createAsyncThunk(
 );
 
 export const deleteSemesterBreak = createAsyncThunk(
-  'semesters/deleteSemesterBreak',
+  'semester/deleteSemesterBreak',
   async ({ semesterId, breakId }, { rejectWithValue }) => {
     try {
       await semesterService.deleteBreak(semesterId, breakId);

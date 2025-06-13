@@ -6,6 +6,8 @@ const AddSemesterModal = ({ isOpen, onClose, onSubmit }) => {
       name: "",
       start_date: "",
       end_date: "",
+      registration_start_date: "",
+      registration_end_date: "",
    });
    const [errors, setErrors] = useState({});
    const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,6 +18,8 @@ const AddSemesterModal = ({ isOpen, onClose, onSubmit }) => {
          name: "",
          start_date: "",
          end_date: "",
+         registration_start_date: "",
+         registration_end_date: "",
       });
       setErrors({});
       setIsSubmitting(false);
@@ -56,6 +60,26 @@ const AddSemesterModal = ({ isOpen, onClose, onSubmit }) => {
          newErrors.end_date = "End date must be after start date";
       }
 
+      // Validate registration dates if provided
+      if (semesterData.registration_start_date && semesterData.registration_end_date) {
+         if (new Date(semesterData.registration_start_date) > new Date(semesterData.registration_end_date)) {
+            newErrors.registration_end_date = "Registration end date must be after registration start date";
+         }
+      }
+
+      // Registration dates should be within semester dates if provided
+      if (semesterData.registration_start_date && semesterData.start_date) {
+         if (new Date(semesterData.registration_start_date) > new Date(semesterData.start_date)) {
+            newErrors.registration_start_date = "Registration start date should be before or on semester start date";
+         }
+      }
+
+      if (semesterData.registration_end_date && semesterData.start_date) {
+         if (new Date(semesterData.registration_end_date) > new Date(semesterData.start_date)) {
+            newErrors.registration_end_date = "Registration end date should be before or on semester start date";
+         }
+      }
+
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
    };
@@ -74,6 +98,12 @@ const AddSemesterModal = ({ isOpen, onClose, onSubmit }) => {
             ...semesterData,
             start_date: new Date(semesterData.start_date).toISOString(),
             end_date: new Date(semesterData.end_date).toISOString(),
+            registration_start_date: semesterData.registration_start_date
+               ? new Date(semesterData.registration_start_date).toISOString()
+               : null,
+            registration_end_date: semesterData.registration_end_date
+               ? new Date(semesterData.registration_end_date).toISOString()
+               : null,
          };
 
          // Submit form data
@@ -185,6 +215,55 @@ const AddSemesterModal = ({ isOpen, onClose, onSubmit }) => {
                            } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                         />
                         {errors.end_date && <p className="mt-1 text-sm text-red-600">{errors.end_date}</p>}
+                     </div>
+
+                     {/* Registration Time Frame Section */}
+                     <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">Registration Time Frame (Optional)</h4>
+                        <p className="text-xs text-gray-600 mb-4">
+                           Set specific dates when students can register for courses in this semester. Leave empty to allow
+                           registration at any time.
+                        </p>
+
+                        {/* Registration Start Date */}
+                        <div className="mb-4">
+                           <label htmlFor="registration_start_date" className="block text-sm font-medium text-gray-700 mb-1">
+                              Registration Start Date
+                           </label>
+                           <input
+                              type="datetime-local"
+                              id="registration_start_date"
+                              name="registration_start_date"
+                              value={semesterData.registration_start_date}
+                              onChange={handleInputChange}
+                              className={`block w-full px-3 py-2 border ${
+                                 errors.registration_start_date ? "border-red-300" : "border-gray-300"
+                              } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
+                           />
+                           {errors.registration_start_date && (
+                              <p className="mt-1 text-sm text-red-600">{errors.registration_start_date}</p>
+                           )}
+                        </div>
+
+                        {/* Registration End Date */}
+                        <div className="mb-0">
+                           <label htmlFor="registration_end_date" className="block text-sm font-medium text-gray-700 mb-1">
+                              Registration End Date
+                           </label>
+                           <input
+                              type="datetime-local"
+                              id="registration_end_date"
+                              name="registration_end_date"
+                              value={semesterData.registration_end_date}
+                              onChange={handleInputChange}
+                              className={`block w-full px-3 py-2 border ${
+                                 errors.registration_end_date ? "border-red-300" : "border-gray-300"
+                              } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
+                           />
+                           {errors.registration_end_date && (
+                              <p className="mt-1 text-sm text-red-600">{errors.registration_end_date}</p>
+                           )}
+                        </div>
                      </div>
 
                      {/* Submit Button */}

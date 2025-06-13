@@ -21,6 +21,7 @@ import Courses from "./pages/Courses";
 import Semesters from "./pages/Semesters";
 import Threads from "./pages/Threads";
 import Assignments from "./pages/Assignments";
+import RegistrationManagement from "./pages/RegistrationManagement";
 import Locations from "./pages/Locations";
 import Storage from "./pages/Storage";
 import Logs from "./pages/Logs";
@@ -74,6 +75,7 @@ function App() {
                            <Route path="semesters" element={<Semesters />} />
                            <Route path="threads" element={<Threads />} />
                            <Route path="assignments" element={<Assignments />} />
+                           <Route path="registration-management" element={<RegistrationManagement />} />
                            <Route path="locations" element={<Locations />} />
                            <Route path="notifications" element={<Notifications />} />
                            <Route path="notification-test" element={<NotificationTest />} />

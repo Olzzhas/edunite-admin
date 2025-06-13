@@ -147,6 +147,14 @@ const semesterService = {
           end_date: semesterData.end_date
         };
 
+        // Add registration dates only if they are provided
+        if (semesterData.registration_start_date) {
+          apiSemesterData.registration_start_date = semesterData.registration_start_date;
+        }
+        if (semesterData.registration_end_date) {
+          apiSemesterData.registration_end_date = semesterData.registration_end_date;
+        }
+
         console.log('Formatted semester data for API:', apiSemesterData);
 
         const response = await apiClient.post('/semester', apiSemesterData);
@@ -191,7 +199,22 @@ const semesterService = {
 
       return updatedSemester;
     } else {
-      const response = await apiClient.put(`/semester/${id}`, semesterData);
+      // Format the data similar to createSemester
+      const apiSemesterData = {
+        name: semesterData.name,
+        start_date: semesterData.start_date,
+        end_date: semesterData.end_date
+      };
+
+      // Add registration dates only if they are provided
+      if (semesterData.registration_start_date) {
+        apiSemesterData.registration_start_date = semesterData.registration_start_date;
+      }
+      if (semesterData.registration_end_date) {
+        apiSemesterData.registration_end_date = semesterData.registration_end_date;
+      }
+
+      const response = await apiClient.put(`/semester/${id}`, apiSemesterData);
       return response.data;
     }
   },
@@ -305,6 +328,184 @@ const semesterService = {
     } else {
       const response = await apiClient.delete(`/semester/${semesterId}/breaks/${breakId}`);
       return response.data;
+    }
+  },
+
+  // Check registration status for a semester
+  getRegistrationStatus: async (semesterId) => {
+    if (MOCK_API) {
+      // Mock implementation - assume registration is always open for mock data
+      return {
+        is_open: true,
+        registration_start_date: null,
+        registration_end_date: null
+      };
+    } else {
+      try {
+        // Use the actual registration-status endpoint
+        const response = await apiClient.get(`/semester/${semesterId}/registration-status`);
+        console.log(`Registration status for semester ${semesterId}:`, response.data);
+
+        // The backend returns the status directly in the new format
+        return {
+          is_open: response.data.is_open,
+          registration_start_date: response.data.registration_start_date,
+          registration_end_date: response.data.registration_end_date
+        };
+      } catch (error) {
+        console.error(`Error fetching registration status for semester ${semesterId}:`, error);
+
+        // Fallback: try to get semester data and calculate client-side
+        try {
+          const semesterResponse = await apiClient.get(`/semester/${semesterId}`);
+          const semester = semesterResponse.data.semester || semesterResponse.data;
+
+          if (!semester) {
+            throw new Error('Semester not found');
+          }
+
+          // Extract registration dates from semester data
+          const registrationStartDate = semester.registration_start_date;
+          const registrationEndDate = semester.registration_end_date;
+
+          // If no registration dates are set, registration is always open
+          if (!registrationStartDate && !registrationEndDate) {
+            return {
+              is_open: true,
+              registration_start_date: null,
+              registration_end_date: null
+            };
+          }
+
+          // Calculate if registration is currently open
+          const now = new Date();
+          let isOpen = true;
+
+          if (registrationStartDate) {
+            // Handle Firebase timestamp format
+            const startDate = registrationStartDate.seconds
+              ? new Date(registrationStartDate.seconds * 1000)
+              : new Date(registrationStartDate);
+            if (now < startDate) {
+              isOpen = false; // Registration hasn't started yet
+            }
+          }
+
+          if (registrationEndDate) {
+            // Handle Firebase timestamp format
+            const endDate = registrationEndDate.seconds
+              ? new Date(registrationEndDate.seconds * 1000)
+              : new Date(registrationEndDate);
+            if (now > endDate) {
+              isOpen = false; // Registration has ended
+            }
+          }
+
+          return {
+            is_open: isOpen,
+            registration_start_date: registrationStartDate,
+            registration_end_date: registrationEndDate
+          };
+        } catch (fallbackError) {
+          console.error(`Fallback error for semester ${semesterId}:`, fallbackError);
+
+          // If we can't determine the status, assume registration is open to be safe
+          return {
+            is_open: true,
+            registration_start_date: null,
+            registration_end_date: null
+          };
+        }
+      }
+    }
+  },
+
+  // Register student to thread with registration time validation
+  registerStudentToThread: async (userId, threadId) => {
+    if (MOCK_API) {
+      // Mock implementation - always succeed
+      return {
+        message: "Student registered successfully",
+        user_id: userId,
+        thread_id: threadId
+      };
+    } else {
+      try {
+        // For now, we'll use the existing thread service method
+        // The backend validation for registration time frames will be added later
+        const response = await apiClient.post(`/thread/${threadId}/students/${userId}`);
+        console.log(`Student ${userId} registered to thread ${threadId}:`, response.data);
+        return {
+          message: "Student registered successfully",
+          user_id: userId,
+          thread_id: threadId,
+          data: response.data
+        };
+      } catch (error) {
+        console.error(`Error registering student ${userId} to thread ${threadId}:`, error);
+
+        // Handle specific registration errors
+        if (error.response && error.response.status === 412) {
+          throw new Error('Registration is closed for this semester');
+        } else if (error.response && error.response.status === 409) {
+          throw new Error('Student is already registered for this thread');
+        } else if (error.response && error.response.status === 429) {
+          throw new Error('Thread is full - maximum number of students reached');
+        } else if (error.response && error.response.status === 404) {
+          throw new Error('Student or thread not found');
+        }
+
+        throw new Error(error.response?.data?.message || error.message || 'Registration failed');
+      }
+    }
+  },
+
+  // Register multiple students to thread
+  registerManyStudentsToThread: async (userIds, threadId) => {
+    if (MOCK_API) {
+      // Mock implementation - always succeed
+      return {
+        message: "Students registered successfully",
+        user_ids: userIds,
+        thread_id: threadId,
+        successful_registrations: userIds.length,
+        failed_registrations: 0
+      };
+    } else {
+      try {
+        // Since bulk registration endpoint doesn't exist yet,
+        // we'll register students one by one using the existing endpoint
+        let successfulRegistrations = 0;
+        let failedRegistrations = 0;
+        const results = [];
+
+        for (const userId of userIds) {
+          try {
+            await apiClient.post(`/thread/${threadId}/students/${userId}`);
+            successfulRegistrations++;
+            results.push({ user_id: userId, status: 'success' });
+          } catch (error) {
+            failedRegistrations++;
+            results.push({
+              user_id: userId,
+              status: 'failed',
+              error: error.response?.data?.message || error.message
+            });
+          }
+        }
+
+        return {
+          message: `Registered ${successfulRegistrations} of ${userIds.length} students`,
+          user_ids: userIds,
+          thread_id: threadId,
+          successful_registrations: successfulRegistrations,
+          failed_registrations: failedRegistrations,
+          results: results
+        };
+      } catch (error) {
+        console.error(`Error in bulk registration for thread ${threadId}:`, error);
+        throw new Error('Bulk registration failed');
+      }
     }
   },
 };

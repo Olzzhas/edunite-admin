@@ -92,6 +92,8 @@ export const MOCK_SEMESTERS = [
     name: 'Spring 2023',
     startDate: '2023-01-15T00:00:00Z',
     endDate: '2023-05-15T00:00:00Z',
+    registrationStartDate: '2023-01-01T09:00:00Z',
+    registrationEndDate: '2023-01-10T23:59:59Z',
     breaks: [
       {
         id: 1,
@@ -106,6 +108,8 @@ export const MOCK_SEMESTERS = [
     name: 'Fall 2023',
     startDate: '2023-08-15T00:00:00Z',
     endDate: '2023-12-15T00:00:00Z',
+    registrationStartDate: '2023-08-01T09:00:00Z',
+    registrationEndDate: '2023-08-10T23:59:59Z',
     breaks: [
       {
         id: 2,
@@ -120,6 +124,8 @@ export const MOCK_SEMESTERS = [
     name: 'Spring 2024',
     startDate: '2024-01-15T00:00:00Z',
     endDate: '2024-05-15T00:00:00Z',
+    registrationStartDate: '2024-12-15T09:00:00Z',
+    registrationEndDate: '2025-01-10T23:59:59Z',
     breaks: [
       {
         id: 3,
